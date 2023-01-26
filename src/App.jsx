@@ -47,8 +47,7 @@ function calculateAspectRatioFit(imgWidth, imgHeight, canvasWidth, canvasHeight)
 }
 
 function App() {
-  // const [assetData, setAssetData] = useState(dummyData)
-  
+
   // Will be obtained from a prop
   // console.log("IN APP : ", assetData)
   
@@ -77,6 +76,12 @@ function App() {
     assetData = new_data;
   }
 
+  function handleOnSave(data) {
+    console.log("*************** SAVED ****************")
+    console.log(data)
+    console.log("**************************************")
+  }
+
   return (
     <div className="app">
       <AssetEditor 
@@ -85,6 +90,7 @@ function App() {
         assetData={flattenedAssetData}
         canvasOptions={canvasOptions}
         onUpdate={handleOnUpdate}  
+        onSave={handleOnSave}
       />
     </div>
   );

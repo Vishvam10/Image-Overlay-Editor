@@ -15,10 +15,30 @@ function getLabelByID(labels, id) {
   return l;
 }
 
+function isValidLabel(labels, id) {
+  labels.forEach((ele) => {
+    // console.log("in check : ", ele["id"])
+    if(ele["id"] === id) {
+      return false;
+    }
+  });
+  return true;
+}
+
+function inverseScaleAssetData(data, scaleX, scaleY) {
+  data.forEach((ele) => {
+    ele["coordinates"][0] = Math.round(ele["coordinates"][0] / scaleX);
+    ele["coordinates"][1] = Math.round(ele["coordinates"][1] / scaleY);
+    ele["coordinates"][2] = Math.round(ele["coordinates"][2] / scaleX);
+    ele["coordinates"][3] = Math.round(ele["coordinates"][3] / scaleY);
+  }); 
+  return data;
+}
+
 function AssetEditor(props) {
 
     let assetImagePath = props.assetPath;
-    let flattenedAssetData = props.assetData;
+    let [flattenedAssetData, setFlattenedAssetData] = useState(props.assetData);
     
     const [currentLabel, setCurrentLabel] = useState();
 
@@ -63,19 +83,37 @@ function AssetEditor(props) {
       /*
           TODO : 1. Create a JSON structure from list and return it
       */
-     return
+
+     const d = inverseScaleAssetData(JSON.parse(JSON.stringify(flattenedAssetData)), assetOptions.scaleX, assetOptions.scaleY);
+
+     props.onSave(d);
+
     }
 
-    function handleOnLabelCreate(new_label) {
+    function handleOnLabelCreate(id, new_label) {
       
       /*
       TODO : 1. Check if the label is valid
              2. Assign parent to the label 
       */
      
-     console.log("REACHED 1", flattenedAssetData.length, new_label)
-     flattenedAssetData.push(new_label)
-     console.log("REACHED 2", flattenedAssetData.length)
+    //  console.log("REACHED 1", flattenedAssetData.length, new_label)
+    //  flattenedAssetData.push(new_label);
+      if(isValidLabel(flattenedAssetData, id)) {
+        const temp = {
+          id: id,
+          coordinates: [
+            new_label["top"],
+            new_label["left"],
+            new_label["width"],
+            new_label["height"],
+          ],
+          type: new_label["type"]
+        }
+        console.log("in create ...", temp);
+    
+        setFlattenedAssetData((prev) => prev.concat(temp))
+      }
     }
 
     console.log("scaled flattened assets : ", flattenedAssetData)
@@ -94,7 +132,7 @@ function AssetEditor(props) {
               canvasOptions={canvasOptions}
               onLabelClick={handleOnLabelClick}
               onLabelEdit={handleLabelOnEdit}
-              onLabelCreated={handleOnLabelCreate}
+              onLabelCreate={handleOnLabelCreate}
               onLabelResize={handleLabelOnResize}
             />
 

@@ -49,8 +49,9 @@ button:active {
 }
 
 .assetEditorLabelInformationHeading {
-  margin: 1rem auto 4rem auto;
+  margin: 2rem 0rem 2rem 0rem;
   color: rgb(132, 132, 132);
+  text-align: left;
 }
 
 .labelInformationGroup {

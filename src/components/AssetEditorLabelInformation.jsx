@@ -8,6 +8,10 @@ function AssetEditorLabelInformation(props) {
     let id="", type="", coordinates="", dimensions="";
     let info="", btn="";
 
+    function handleOnClick() {
+        props.onSaveAndExit(labelData);
+    }
+
     if(labelData) {
         id = labelData["id"];
         type = labelData["type"];
@@ -39,7 +43,7 @@ function AssetEditorLabelInformation(props) {
        
     } else {
         btn = (
-            <button className="labelInformationButton">Save and Exit</button>
+            <button className="labelInformationButton" onClick={handleOnClick}>Save and Exit</button>
         )
         info = btn
     }
