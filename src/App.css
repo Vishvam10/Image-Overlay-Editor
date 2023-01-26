@@ -1,38 +1,110 @@
-.App {
-  text-align: center;
+html {
+  font-size: 63.5%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+button {
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  cursor: pointer;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+button:hover {
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(1.0);
+}
+
+.app {
+  width: 100vw;
+  height: 100vh;
+}
+
+
+.assetEditor {
+  background-color: #fafafa;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.assetEditorLabelInformation {
+  height: 90%;
+  width: 10%;
+  border-radius: 2rem;
+  padding: 2rem;
+  margin: 2rem;
+  background-color: #ffffff;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+}
+
+.assetEditorLabelInformationHeading {
+  margin: 1rem auto 4rem auto;
+  color: rgb(132, 132, 132);
+}
+
+.labelInformationGroup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.labelInformationSubGroup {
+  display: flex;
+  flex-direction: column;
+  margin: 0rem 0rem 2rem 0rem;
+}
+
+.labelInformationHeader {
+  font-size: 1.2rem;
+  color: rgb(132, 132, 132);
+}
+
+.labelInformationDetail {
+  font-size: 2rem;
+  margin: -1rem 0rem 0rem 0rem;
+  color: rgb(91, 91, 91);
+}
+
+.assetEditorCanvas {
+  height: 90%;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+  border-radius: 2rem;
+  padding: 2rem;
+  margin: 2rem;
+  background-color: #ffffff;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
-.App-link {
-  color: #61dafb;
+.overlayCanvas {
+  position: absolute !important;
+  z-index: 1000;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.labelInformationButton {
+  height: 4rem;
+  width: 100%;
+  margin: 4rem 0rem 0rem 0rem;
+  background-color: #dedede;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  border: none;
+  border-radius: 1.2rem;
+}
+
+.assetImage {
+  opacity: 0.7;
 }

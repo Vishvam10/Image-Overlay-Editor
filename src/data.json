@@ -1,0 +1,42 @@
+{
+    "containers": [
+        {
+            "coordinates": [
+                0,
+                0,
+                2830,
+                257
+            ],
+            "type": "container"
+        },
+        {
+            "coordinates": [
+                0,
+                263,
+                2830,
+                783
+            ],
+            "type": "container",
+            "children": [
+                {
+                    "type": "image",
+                    "coordinates": [
+                        1467,
+                        329,
+                        1020,
+                        710
+                    ]
+                }               
+            ]
+        },
+        {
+            "coordinates": [
+                0,
+                1044,
+                2830,
+                308
+            ],
+            "type": "container"
+        }
+    ]
+}
