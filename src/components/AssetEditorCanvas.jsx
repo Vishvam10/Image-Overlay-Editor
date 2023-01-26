@@ -28,7 +28,6 @@ fabric.util.addListener(document.body, "keydown", function (options) {
         return;
     }
     keyPressed = options.which || options.keyCode; 
-    console.log(keyPressed)
 });
 
 function AssetEditorCanvas(props) { 
@@ -40,31 +39,35 @@ function AssetEditorCanvas(props) {
 
     const labelGap = 20;
 
-    const [canvas, setCanvas] = useState("");  
-    const [labels, setLabels] = useState("");  
+    const [canvas, setCanvas] = useState(null);  
+    const [labels, setLabels] = useState(null);  
 
     useEffect(() => {
-        console.log("INIT . . .");
+        console.log("INIT . . .", canvas);
         function initCanvas() {
             let c = new fabric.Canvas("overlay", {
                 height: canvasOptions.height,
                 width: canvasOptions.width,
                 containerClass: "overlayCanvas",
                 selection: false,
+                uniScaleTransform: true,
                 preserveObjectStacking: true,
                 altSelectionKey: true
             })
             c.setBackgroundColor(null, c.renderAll.bind(c));
             return c;
         }
-
-        setCanvas(initCanvas());
+        if(canvas === null) {
+            setCanvas(initCanvas());
+        } 
         setLabels(assetData);
 
     }, [assetData]);  
     
     useEffect(() => {
         if(canvas && labels) {
+            canvas.clear();
+            canvas.remove();
             console.log("READY . . .", labels.length);
             rl(labels);
         }
@@ -76,6 +79,17 @@ function AssetEditorCanvas(props) {
             canvas.on("mouse:down", function(options) {
                 let selectedLabel;
                 if(options.target) {
+                    if(keyPressed === 16) {
+                        let toBeDeletedLabel;
+                        console.log("shift clicked");
+                        const rectTarget = canvas.getActiveObject()._objects[0];
+                        labels.forEach((ele) => {
+                            if(ele.id === rectTarget.id) {
+                                toBeDeletedLabel = ele;  
+                            }
+                        });
+                        labelDelete(toBeDeletedLabel)   
+                    }
                     const rectTarget = options.target._objects[0];
                     if (rectTarget) {
                         labels.forEach((ele) => {
@@ -99,32 +113,34 @@ function AssetEditorCanvas(props) {
                     return;
                 } else {
                     if(keyPressed == 17) {
-                        canvas.on()
                         const x = Math.round(options.pointer.x);
                         const y = Math.round(options.pointer.y);
                       
                         console.log("in up ...", x, y);
                         labelCreate({
-                            top: Math.round(x),
-                            left: Math.round(y),
-                            width: 100,
-                            height: 100,
-                            type: "division"
+                            left: Math.round(x),
+                            top: Math.round(y),
+                            width: 300,
+                            height: 300,
+                            type: "div"
                         })
                     }
                 }
             });
-                
         }
     }, [canvas, assetData])
 
+    function labelDelete(l) {
+        console.log("deleting ...", l);
+        props.onLabelDelete(l);
+    }
 
     function labelClick(l) {
         props.onLabelClick(l);
     }
 
     function labelCreate(values) {
-        console.log("creating ...", values)
+        console.log("creating ...", values);
         const id = getNextID(labels);
         props.onLabelCreate(id, values);
         keyPressed = null;
@@ -134,12 +150,13 @@ function AssetEditorCanvas(props) {
         props.onLabelEdit(id, new_values)
     }
 
-    
     function rl(l) {
+        console.log("in render : ", l.length);
+        canvas.clear();
         canvas.remove();
         for(let i=0; i<l.length; i++) {
-            const ele = l[i]
-            let rect = new fabric.Rect({
+            const ele = l[i];
+            const rect = new fabric.Rect({
                 id: ele["id"],
                 left: ele["coordinates"][0],
                 top: ele["coordinates"][1],
@@ -152,19 +169,24 @@ function AssetEditorCanvas(props) {
                 transparentCorners: false
             });
         
-            let text = new fabric.Textbox(ele["type"], {
+            const text = new fabric.Textbox(ele["type"], {
                 left: rect.left + labelGap,
                 top: rect.top + labelGap,
                 fontFamily: "Inconsolata",
                 fontSize: 20,
+                selectable: true,
                 editable: true
             });
     
-            let group = new fabric.Group([rect,text]);
+            const group = new fabric.Group([rect, text], {
+                selectable: true
+            });
+
+
             canvas.add(group);
-            group.addWithUpdate();
             group.setCoords();
             canvas.renderAll();
+
             // TODO
             // group.on("scaling", function(e) {
             //     // const t = e.transform.target;

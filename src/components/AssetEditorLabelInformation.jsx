@@ -12,6 +12,14 @@ function AssetEditorLabelInformation(props) {
         props.onSaveAndExit(labelData);
     }
 
+    function handleUpdateLabel(e) {
+        const type = String(e.target.innerText);
+        if(type.length > 0) {
+            labelData["type"] = type;
+            props.onLabelTypeChange(labelData["id"], type);
+        }
+    }
+
     if(labelData) {
         id = labelData["id"];
         type = labelData["type"];
@@ -26,7 +34,7 @@ function AssetEditorLabelInformation(props) {
                 </span>
                 <span className="labelInformationSubGroup">
                     <h3 className="labelInformationHeader">TYPE</h3>
-                    <p className="labelInformationDetail">{type}</p>
+                    <p className="labelInformationDetail" contentEditable="true" onBlur={handleUpdateLabel} suppressContentEditableWarning={true}>{type}</p>
                 </span>
                 <span className="labelInformationSubGroup">
                     <h3 className="labelInformationHeader">COORDINATES</h3>

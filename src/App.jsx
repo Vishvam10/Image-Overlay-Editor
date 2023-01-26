@@ -61,6 +61,16 @@ function App() {
   
   const resizedDimensions = calculateAspectRatioFit(img.width, img.height, canvasOptions.width, canvasOptions.height);
   
+  
+  // let flattenedAssetData = [{
+  //   "coordinates": [
+  //     0,
+  //     0,
+  //     2830,
+  //     257
+  //   ],
+  //   "type": "container"
+  // }]
   let flattenedAssetData = flattenLabels(assetData.containers);
   flattenedAssetData = assignID(flattenedAssetData);
   flattenedAssetData = scaleAssetData(flattenedAssetData, resizedDimensions.scaleX, resizedDimensions.scaleY);
@@ -70,10 +80,6 @@ function App() {
     scaleY: resizedDimensions.scaleY,
     width: Math.round(resizedDimensions.width),
     height: Math.round(resizedDimensions.height)
-  }
-  
-  function handleOnUpdate(new_data) {
-    assetData = new_data;
   }
 
   function handleOnSave(data) {
@@ -89,7 +95,6 @@ function App() {
         assetOptions={assetOptions}
         assetData={flattenedAssetData}
         canvasOptions={canvasOptions}
-        onUpdate={handleOnUpdate}  
         onSave={handleOnSave}
       />
     </div>

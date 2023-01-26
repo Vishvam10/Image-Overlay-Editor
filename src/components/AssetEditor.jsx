@@ -51,15 +51,33 @@ function AssetEditor(props) {
 
     function handleLabelOnEdit(id, new_values) {
       const label = getLabelByID(flattenedAssetData, id);
-      label["coordinates"] = [
-        Math.round(new_values["left"]), 
-        Math.round(new_values["top"]), 
-        Math.round(new_values["width"]), 
-        Math.round(new_values["height"])
-      ]
-      console.log("edited ...", id, new_values);
-      setCurrentLabel(label);
+      console.log("in on edit ... ", label);
+      if(label) {
+        label["coordinates"] = [
+          Math.round(new_values["left"]), 
+          Math.round(new_values["top"]), 
+          Math.round(new_values["width"]), 
+          Math.round(new_values["height"])
+        ]
+        console.log("edited ...", id, new_values);
+        setCurrentLabel(label);
+      }
       return;
+    }
+
+    function handleLabelOnDelete(label) {
+      console.log("to be deleted ... ", label, label["id"])
+      const temp = JSON.parse(JSON.stringify(flattenedAssetData));
+      
+      for(let i = 0; i < temp.length; i++) {
+        if(temp[i]["id"] === label["id"]) {
+          temp.splice(i, 1);
+          break;
+        }
+      }
+
+      setFlattenedAssetData(temp);
+
     }
     
     function handleLabelOnResize(id, new_values) {
@@ -103,36 +121,48 @@ function AssetEditor(props) {
         const temp = {
           id: id,
           coordinates: [
-            new_label["top"],
             new_label["left"],
+            new_label["top"],
             new_label["width"],
             new_label["height"],
           ],
           type: new_label["type"]
         }
         console.log("in create ...", temp);
-    
-        setFlattenedAssetData((prev) => prev.concat(temp))
+        setFlattenedAssetData((prev) => [...prev, temp]);
       }
     }
 
+    function handleLabelTypeChange(id, new_type) {
+      const temp = JSON.parse(JSON.stringify(flattenedAssetData));
+      console.log(temp, id, new_type)
+      temp.forEach((ele) => {
+        if(ele["id"] === id) {
+          ele["type"] = new_type;
+        }
+      });
+      setFlattenedAssetData(temp);
+    }
+
+    console.log("in asset editor");
     console.log("scaled flattened assets : ", flattenedAssetData)
 
     return (
        <div className="assetEditor">
             <AssetEditorLabelInformation 
               labelData={currentLabel}
+              onLabelTypeChange={handleLabelTypeChange}
               onSaveAndExit={handleSaveAndExit}
             />
             <AssetEditorCanvas 
               assetImagePath={assetImagePath} 
               assetOptions={assetOptions}
               assetData={flattenedAssetData}
-              currentLabel={currentLabel}
               canvasOptions={canvasOptions}
               onLabelClick={handleOnLabelClick}
               onLabelEdit={handleLabelOnEdit}
               onLabelCreate={handleOnLabelCreate}
+              onLabelDelete={handleLabelOnDelete}
               onLabelResize={handleLabelOnResize}
             />
 
