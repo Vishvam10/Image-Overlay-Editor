@@ -133,6 +133,7 @@ function AssetEditorCanvas(props) {
     function labelDelete(l) {
         console.log("deleting ...", l);
         props.onLabelDelete(l);
+        keyPressed = null;
     }
 
     function labelClick(l) {

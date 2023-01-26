@@ -1,20 +1,38 @@
 # Image Overlay Editor
 
-Made using `React` and `Fabric.js`
+
+Made using `React` and `Fabric.js`. 
 
 <br>
 
 ## Usage 
+___
 
+<br>
+
+**Show Label Details** :
 - Click on existing label to show its detail
-- Edit the label (resize, translate, etc) and click on white space to exit the edit mode
+
+**Edit Label Details** :
+- To edit the label transformation, simply resize, translate, etc by using the controls provided. Click on white space to exit the edit mode
+- To edit the label type, click on the `type` field in the side panel, change it, and click anywhere on the sidepanel to update the value. Clicking anywhere on the canvas should reflect the changes
+
+**Create New Label** :
+- `Ctrl + Left Click` on white space to create a label 
+
+**Delete Label**
+- `Shift + Left Click` on a label to delete it.  
+
+**Save and Exit** :
+
 - Click on *Save and Exit* button to save the edited labels as a JSON
-- Click on white space to create a label 
 
-Buggy :
-- Upon creating a new label, it not selectable for some reason
+<br>
 
-Todo :
-- Edit label from the `Fabric.TextBox()`. Being grouped with the `Fabric.rect()` has been causing some issues.
+## Note
+___
 
-**Note :** The image is resized to fit into a (1000, 600)px canvas. So, for floating point pixels, I have used `Math.round()` to approximate. Hence, there will be a slight (usually unnoticeable) offset while rendering the labels.
+<br>
+
+- The image is resized to fit into a (1000, 600)px canvas. So, for floating point pixels, I have used `Math.round()` to approximate. Hence, there will be a slight (usually unnoticeable) offset while rendering the labels
+- There is **no undo feature**
