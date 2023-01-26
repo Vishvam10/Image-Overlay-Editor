@@ -17,7 +17,6 @@ function getLabelByID(labels, id) {
 
 function isValidLabel(labels, id) {
   labels.forEach((ele) => {
-    // console.log("in check : ", ele["id"])
     if(ele["id"] === id) {
       return false;
     }
@@ -51,7 +50,6 @@ function AssetEditor(props) {
 
     function handleLabelOnEdit(id, new_values) {
       const label = getLabelByID(flattenedAssetData, id);
-      console.log("in on edit ... ", label);
       if(label) {
         label["coordinates"] = [
           Math.round(new_values["left"]), 
@@ -59,14 +57,12 @@ function AssetEditor(props) {
           Math.round(new_values["width"]), 
           Math.round(new_values["height"])
         ]
-        console.log("edited ...", id, new_values);
         setCurrentLabel(label);
       }
       return;
     }
 
     function handleLabelOnDelete(label) {
-      console.log("to be deleted ... ", label, label["id"])
       const temp = JSON.parse(JSON.stringify(flattenedAssetData));
       
       for(let i = 0; i < temp.length; i++) {
@@ -115,8 +111,6 @@ function AssetEditor(props) {
              2. Assign parent to the label 
       */
      
-    //  console.log("REACHED 1", flattenedAssetData.length, new_label)
-    //  flattenedAssetData.push(new_label);
       if(isValidLabel(flattenedAssetData, id)) {
         const temp = {
           id: id,
@@ -128,14 +122,12 @@ function AssetEditor(props) {
           ],
           type: new_label["type"]
         }
-        console.log("in create ...", temp);
         setFlattenedAssetData((prev) => [...prev, temp]);
       }
     }
 
     function handleLabelTypeChange(id, new_type) {
       const temp = JSON.parse(JSON.stringify(flattenedAssetData));
-      console.log(temp, id, new_type)
       temp.forEach((ele) => {
         if(ele["id"] === id) {
           ele["type"] = new_type;
@@ -143,9 +135,6 @@ function AssetEditor(props) {
       });
       setFlattenedAssetData(temp);
     }
-
-    console.log("in asset editor");
-    console.log("scaled flattened assets : ", flattenedAssetData)
 
     return (
        <div className="assetEditor">

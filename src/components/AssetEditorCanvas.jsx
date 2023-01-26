@@ -43,7 +43,7 @@ function AssetEditorCanvas(props) {
     const [labels, setLabels] = useState(null);  
 
     useEffect(() => {
-        console.log("INIT . . .", canvas);
+        console.log("init");
         function initCanvas() {
             let c = new fabric.Canvas("overlay", {
                 height: canvasOptions.height,
@@ -68,7 +68,6 @@ function AssetEditorCanvas(props) {
         if(canvas && labels) {
             canvas.clear();
             canvas.remove();
-            console.log("READY . . .", labels.length);
             rl(labels);
         }
     }, [labels])
@@ -81,7 +80,6 @@ function AssetEditorCanvas(props) {
                 if(options.target) {
                     if(keyPressed === 16) {
                         let toBeDeletedLabel;
-                        console.log("shift clicked");
                         const rectTarget = canvas.getActiveObject()._objects[0];
                         labels.forEach((ele) => {
                             if(ele.id === rectTarget.id) {
@@ -116,7 +114,6 @@ function AssetEditorCanvas(props) {
                         const x = Math.round(options.pointer.x);
                         const y = Math.round(options.pointer.y);
                       
-                        console.log("in up ...", x, y);
                         labelCreate({
                             left: Math.round(x),
                             top: Math.round(y),
@@ -131,7 +128,6 @@ function AssetEditorCanvas(props) {
     }, [canvas, assetData])
 
     function labelDelete(l) {
-        console.log("deleting ...", l);
         props.onLabelDelete(l);
         keyPressed = null;
     }
@@ -141,7 +137,6 @@ function AssetEditorCanvas(props) {
     }
 
     function labelCreate(values) {
-        console.log("creating ...", values);
         const id = getNextID(labels);
         props.onLabelCreate(id, values);
         keyPressed = null;
@@ -152,7 +147,6 @@ function AssetEditorCanvas(props) {
     }
 
     function rl(l) {
-        console.log("in render : ", l.length);
         canvas.clear();
         canvas.remove();
         for(let i=0; i<l.length; i++) {

@@ -2,9 +2,7 @@ import AssetEditor from './components/AssetEditor';
 import assetImagePath from "./assets/img.png"
 import assetData from "./data.json"
 
-
 import './App.css';
-// import { useState } from 'react';
 
 
 function assignID(labels) {
@@ -61,16 +59,6 @@ function App() {
   
   const resizedDimensions = calculateAspectRatioFit(img.width, img.height, canvasOptions.width, canvasOptions.height);
   
-  
-  // let flattenedAssetData = [{
-  //   "coordinates": [
-  //     0,
-  //     0,
-  //     2830,
-  //     257
-  //   ],
-  //   "type": "container"
-  // }]
   let flattenedAssetData = flattenLabels(assetData.containers);
   flattenedAssetData = assignID(flattenedAssetData);
   flattenedAssetData = scaleAssetData(flattenedAssetData, resizedDimensions.scaleX, resizedDimensions.scaleY);
@@ -86,6 +74,7 @@ function App() {
     console.log("*************** SAVED ****************")
     console.log(data)
     console.log("**************************************")
+    alert("Saved ! Check console to see the updated data")
   }
 
   return (
