@@ -7,8 +7,8 @@ import './App.css';
 
 function assignID(labels) {
 
-  labels.forEach((ele, ind) => {
-    ele["id"] = ind
+  labels.forEach((ele) => {
+    ele["id"] = Math.floor(Math.random() * 10000);
   });
 
   return labels;

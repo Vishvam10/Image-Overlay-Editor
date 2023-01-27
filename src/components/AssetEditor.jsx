@@ -63,16 +63,9 @@ function AssetEditor(props) {
     }
 
     function handleLabelOnDelete(label) {
-      const temp = JSON.parse(JSON.stringify(flattenedAssetData));
-      
-      for(let i = 0; i < temp.length; i++) {
-        if(temp[i]["id"] === label["id"]) {
-          temp.splice(i, 1);
-          break;
-        }
-      }
-
-      setFlattenedAssetData(temp);
+      setFlattenedAssetData((prev) => {
+        return prev.filter(ele => ele["id"] != label["id"]);
+       });
 
     }
     
@@ -136,6 +129,8 @@ function AssetEditor(props) {
       setFlattenedAssetData(temp);
     }
 
+    console.log("in asset editor ...", flattenedAssetData.length)
+
     return (
        <div className="assetEditor">
             <AssetEditorLabelInformation 
@@ -161,4 +156,4 @@ function AssetEditor(props) {
 
 }
 
-  export default AssetEditor;
+export default AssetEditor;

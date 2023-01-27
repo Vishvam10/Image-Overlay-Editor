@@ -4,23 +4,15 @@ import { fabric } from "fabric";
 import "../App.css"
 
 var keyPressed;
+var colorList = {
+    red: ["#d90166", "#9c004a", "#840000", "#b4262a", "#4a0100"],
+    green: ["#96d117", "#529c16", "#6a9c41", "#71d61e", "#1d9117"],
+    blue: ["#1a9c80", "#0ee3b5", "#0b8a6e", "#0f7b85", "#13c3d4"],
+    grey: ["#999999", "#636363", "#2e2e2e", "#000000"]
+} 
 
-function getDarkColor() {
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-        color += Math.floor(Math.random() * 10);
-    }
-    return color;
-}
-
-function getNextID(labels) {
-    let res = 0;
-    labels.forEach((ele) => {
-        if(res < ele.id) {
-            res = ele.id;
-        }
-    });
-    return res + 1;
+function getDarkColor(ind) {
+    return colorList["blue"][ind % 5]
 }
 
 fabric.util.addListener(document.body, "keydown", function (options) {
@@ -137,7 +129,7 @@ function AssetEditorCanvas(props) {
     }
 
     function labelCreate(values) {
-        const id = getNextID(labels);
+        const id = Math.floor(Math.random() * 10000);
         props.onLabelCreate(id, values);
         keyPressed = null;
     }
@@ -155,10 +147,10 @@ function AssetEditorCanvas(props) {
                 id: ele["id"],
                 left: ele["coordinates"][0],
                 top: ele["coordinates"][1],
-                fill: "rgba(255,0,0,0.1)",
+                fill: "rgba(0,0,0,0.05)",
                 width: ele["coordinates"][2],
                 height: ele["coordinates"][3],
-                stroke: getDarkColor(),
+                stroke: getDarkColor(i),
                 strokeWidth: 4,
                 selectable: true,
                 transparentCorners: false
