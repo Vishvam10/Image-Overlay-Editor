@@ -104,8 +104,19 @@ button:active {
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   border: none;
   border-radius: 1.2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
 }
 
 .assetImage {
   opacity: 0.7;
+}
+
+.hideInput {
+  height: 0px;
+  width: 0px; 
+  overflow:hidden;
 }

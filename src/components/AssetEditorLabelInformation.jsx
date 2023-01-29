@@ -1,4 +1,5 @@
 
+import { useRef } from "react";
 import "../App.css";
 
 
@@ -8,7 +9,9 @@ function AssetEditorLabelInformation(props) {
     let id="", type="", coordinates="", dimensions="";
     let info="", btn="";
 
-    function handleOnClick() {
+    const inputRef = useRef();
+
+    function handleOnSaveAndExit() {
         props.onSaveAndExit(labelData);
     }
 
@@ -17,6 +20,14 @@ function AssetEditorLabelInformation(props) {
         if(type.length > 0) {
             labelData["type"] = type;
             props.onLabelTypeChange(labelData["id"], type);
+        }
+    }
+
+    function handleFileUpload() {
+        const inp = inputRef.current;
+        if(inp) {
+            console.log("input ref ...", inp)
+            // const formData = new FormData();
         }
     }
 
@@ -51,7 +62,16 @@ function AssetEditorLabelInformation(props) {
        
     } else {
         btn = (
-            <button className="labelInformationButton" onClick={handleOnClick}>Save and Exit</button>
+            <>
+                <button onClick={handleFileUpload} className="labelInformationButton">Upload File</button>
+                <div className="hideInput">
+                  <input id="upfile" type="file" ref={inputRef}/>
+                </div>
+                <button 
+                    className="labelInformationButton" 
+                    onClick={handleOnSaveAndExit}>Save and Exit
+                </button>
+            </>
         )
         info = btn
     }

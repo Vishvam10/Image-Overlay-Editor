@@ -21,6 +21,7 @@ function isValidLabel(labels, id) {
       return false;
     }
   });
+
   return true;
 }
 
@@ -63,9 +64,11 @@ function AssetEditor(props) {
     }
 
     function handleLabelOnDelete(label) {
-      setFlattenedAssetData((prev) => {
-        return prev.filter(ele => ele["id"] != label["id"]);
-       });
+      if(label) {
+        setFlattenedAssetData(function(prev) {
+          return prev.filter(ele => ele["id"] != label["id"]);
+        });
+      }
 
     }
     
@@ -103,8 +106,9 @@ function AssetEditor(props) {
       TODO : 1. Check if the label is valid
              2. Assign parent to the label 
       */
-     
+
       if(isValidLabel(flattenedAssetData, id)) {
+        console.log("valid : ", isValidLabel(flattenedAssetData, id))
         const temp = {
           id: id,
           coordinates: [
@@ -113,9 +117,14 @@ function AssetEditor(props) {
             new_label["width"],
             new_label["height"],
           ],
-          type: new_label["type"]
+          type: new_label["type"],
+
         }
-        setFlattenedAssetData((prev) => [...prev, temp]);
+
+        setFlattenedAssetData(function(prev) {
+          // console.log("prev : ", prev)
+          return [...prev, temp];
+        });
       }
     }
 
@@ -129,7 +138,7 @@ function AssetEditor(props) {
       setFlattenedAssetData(temp);
     }
 
-    console.log("in asset editor ...", flattenedAssetData.length)
+    // console.log("in asset editor ...", flattenedAssetData.length)
 
     return (
        <div className="assetEditor">
@@ -139,10 +148,10 @@ function AssetEditor(props) {
               onSaveAndExit={handleSaveAndExit}
             />
             <AssetEditorCanvas 
+              canvasOptions={canvasOptions}
               assetImagePath={assetImagePath} 
               assetOptions={assetOptions}
               assetData={flattenedAssetData}
-              canvasOptions={canvasOptions}
               onLabelClick={handleOnLabelClick}
               onLabelEdit={handleLabelOnEdit}
               onLabelCreate={handleOnLabelCreate}

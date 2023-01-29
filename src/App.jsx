@@ -3,6 +3,7 @@ import assetImagePath from "./assets/img.png"
 import assetData from "./data.json"
 
 import './App.css';
+import { useEffect, useState } from 'react';
 
 
 function assignID(labels) {
@@ -36,7 +37,6 @@ function scaleAssetData(data, scaleX, scaleY) {
   return data;
 }
 
-
 function calculateAspectRatioFit(imgWidth, imgHeight, canvasWidth, canvasHeight) {
   const scaleX = canvasWidth / imgWidth;
   const scaleY = canvasHeight / imgHeight
@@ -47,12 +47,14 @@ function calculateAspectRatioFit(imgWidth, imgHeight, canvasWidth, canvasHeight)
 function App() {
 
   // Will be obtained from a prop
-  // console.log("IN APP : ", assetData)
   
+  const [temp, setTemp] = useState(null);
+
   let canvasOptions = {
     width : 1000,
     height : 600  
   }
+
 
   let img = new Image();
   img.src = assetImagePath;
