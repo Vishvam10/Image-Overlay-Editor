@@ -15,7 +15,7 @@ function getLabelByID(labels, id) {
   return l;
 }
 
-function isValidLabel(labels, id) {
+function isValidLabel(labels, id, new_label) {
   labels.forEach((ele) => {
     if(ele["id"] === id) {
       return false;
@@ -63,10 +63,10 @@ function AssetEditor(props) {
       return;
     }
 
-    function handleLabelOnDelete(label) {
-      if(label) {
+    function handleLabelOnDelete(id) {
+      if(id) {
         setFlattenedAssetData(function(prev) {
-          return prev.filter(ele => ele["id"] != label["id"]);
+          return prev.filter(ele => ele["id"] != id);
         });
       }
 
@@ -102,29 +102,24 @@ function AssetEditor(props) {
 
     function handleOnLabelCreate(id, new_label) {
       
-      /*
-      TODO : 1. Check if the label is valid
-             2. Assign parent to the label 
-      */
-
-      if(isValidLabel(flattenedAssetData, id)) {
-        console.log("valid : ", isValidLabel(flattenedAssetData, id))
-        const temp = {
-          id: id,
-          coordinates: [
-            new_label["left"],
-            new_label["top"],
-            new_label["width"],
-            new_label["height"],
-          ],
-          type: new_label["type"],
-
+      if(new_label) {
+        if(isValidLabel(flattenedAssetData, id, new_label)) {
+          const temp = {
+            id: id,
+            coordinates: [
+              new_label["left"],
+              new_label["top"],
+              new_label["width"],
+              new_label["height"],
+            ],
+            type: new_label["type"],
+  
+          }
+  
+          setFlattenedAssetData(function(prev) {
+            return [...prev, temp];
+          });
         }
-
-        setFlattenedAssetData(function(prev) {
-          // console.log("prev : ", prev)
-          return [...prev, temp];
-        });
       }
     }
 

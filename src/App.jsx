@@ -3,17 +3,27 @@ import assetImagePath from "./assets/img.png"
 import assetData from "./data.json"
 
 import './App.css';
-import { useEffect, useState } from 'react';
 
 
 function assignID(labels) {
 
   labels.forEach((ele) => {
     ele["id"] = Math.floor(Math.random() * 10000);
+    if(ele["children"]) {
+      assignID(ele["children"])
+    }
   });
-
   return labels;
+}
 
+function assignParent(labels, parent) {
+  labels.forEach((ele) => {
+    if(ele["children"]) {
+      assignParent(ele["children"], ele["id"])
+    } 
+    ele["parent"] = parent  
+  });
+  return labels;
 }
 
 function flattenLabels(labels) {
@@ -46,10 +56,6 @@ function calculateAspectRatioFit(imgWidth, imgHeight, canvasWidth, canvasHeight)
 
 function App() {
 
-  // Will be obtained from a prop
-  
-  const [temp, setTemp] = useState(null);
-
   let canvasOptions = {
     width : 1000,
     height : 600  
@@ -61,9 +67,11 @@ function App() {
   
   const resizedDimensions = calculateAspectRatioFit(img.width, img.height, canvasOptions.width, canvasOptions.height);
   
-  let flattenedAssetData = flattenLabels(assetData.containers);
-  flattenedAssetData = assignID(flattenedAssetData);
-  flattenedAssetData = scaleAssetData(flattenedAssetData, resizedDimensions.scaleX, resizedDimensions.scaleY);
+  let data = assignID(assetData.containers);
+  data = assignParent(data, null)
+  data = flattenLabels(data)
+  data = scaleAssetData(data, resizedDimensions.scaleX, resizedDimensions.scaleY);
+
   
   let assetOptions = {
     scaleX: resizedDimensions.scaleX,
@@ -71,6 +79,8 @@ function App() {
     width: Math.round(resizedDimensions.width),
     height: Math.round(resizedDimensions.height)
   }
+
+  console.log(data);
 
   function handleOnSave(data) {
     console.log("*************** SAVED ****************")
@@ -84,7 +94,7 @@ function App() {
       <AssetEditor 
         assetPath={assetImagePath} 
         assetOptions={assetOptions}
-        assetData={flattenedAssetData}
+        assetData={data}
         canvasOptions={canvasOptions}
         onSave={handleOnSave}
       />

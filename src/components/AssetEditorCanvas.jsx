@@ -14,38 +14,7 @@ var colorList = {
 } 
 
 function getDarkColor(ind) {
-    return colorList["blue"][ind % 5]
-}
-
-function getLabelByCoordinates(l, mx, my) {
-    if(l) {
-        let min_diff = 100000;
-        let min_ind = -1;
-        for(let i=0; i<l.length; i++) {
-            const ele = l[i];
-            const [x, y, w, h] = ele["coordinates"];
-            if(
-                (mx >= x) && (mx <= x+w) && 
-                (my >= y) && (my <= my+h)
-            ) {
-                let diff = Math.min(
-                        Math.abs(mx - x), 
-                        Math.abs(mx - (x + w)), 
-                        Math.abs(my - y), 
-                        Math.abs(my - (y + h)
-                    )
-                );
-                if(diff < min_diff) {
-                    min_diff = diff;
-                    min_ind = i;
-                }
-            }
-        }
-        console.log("Label index : ", min_ind, l[min_ind])
-        if(min_ind != -1) {
-            return l[min_ind];
-        }
-    }
+    return colorList["red"][ind % 5]
 }
 
 function AssetEditorCanvas(props) { 
@@ -53,11 +22,7 @@ function AssetEditorCanvas(props) {
     const assetImagePath = props.assetImagePath;
     const assetOptions = props.assetOptions;
     const assetData = props.assetData;
-    const currentLabel = props.currentLabel;
     const canvasOptions = props.canvasOptions;
-
-
-    const labelGap = 20;
 
     const [canvas, setCanvas] = useState(null);  
     const [labels, setLabels] = useState(null);  
@@ -75,7 +40,7 @@ function AssetEditorCanvas(props) {
                 uniScaleTransform: true,
                 preserveObjectStacking: true,
                 altSelectionKey: true,
-                renderOnAddRemove: false
+                // perPixelTargetFind: true  
             })
             c.setBackgroundColor(null, c.renderAll.bind(c));
             return c;
@@ -91,19 +56,7 @@ function AssetEditorCanvas(props) {
         if(canvas && labels) {
             canvas.clear();
             canvas.remove();
-            console.log("labels length : ", labels.length);
             rl(labels);
-                
-            // if(keyPressed === 16) {
-            //     // Delete label : Shift + Left Click 
-            //     handleOnLabelDelete(options);  
-            // } else if(keyPressed == 17) {
-            //     // Create label : Ctrl + Left Click 
-            //     handleOnLabelCreate(options)
-            // } else {
-            //     // Read Label : Left Click 
-            //     handleOnLabelClick(options);
-            // }
 
             canvas.on("mouse:down", (options) => {
                 if(options.button === 1) {
@@ -117,13 +70,11 @@ function AssetEditorCanvas(props) {
                 mouseY = Math.round(pointer.y);
             })
     
-
             // console.log('rerender', labels.length);
         }
     }, [labels])
 
     useEffect(() => {
-        
         fabric.util.addListener(document.body, "keydown", function (options) {
             if (options.repeat) {
                 return;
@@ -131,35 +82,40 @@ function AssetEditorCanvas(props) {
             keyPressed = options.which || options.keyCode; 
             keyPressedOptions = options;
 
-            if((options.key === "c") && (options.keyCode === 67)) {
-                console.log("create ... ", mouseX, mouseY);
-                handleOnLabelCreate(mouseX, mouseY);
-                keyPressed = null;
-            } else if((options.key === "d") && (options.keyCode === 68)) {
-                console.log("delete ... ", mouseX, mouseY);
-                const l = getLabelByCoordinates(labels, mouseX, mouseY);
-                handleOnLabelDelete(l);
-                keyPressed = null;
+            if(canvas) {
+                if((options.key === "c") && (options.keyCode === 67)) {
+                    handleOnLabelCreate(mouseX, mouseY);
+                    keyPressed = null;
+                } else if((options.key === "d") && (options.keyCode === 68)) {
+                    const l = canvas.getActiveObject();
+                    if(l) {
+                        const rect = l._objects[0]["id"]
+                        handleOnLabelDelete(rect);
+                    }
+                    keyPressed = null;
+                }
             }
         });
 
-    }, [labels])
+    },[canvas])
 
 
     function handleOnLabelCreate(x, y) {
         labelCreate({
             left: Math.round(x),
             top: Math.round(y),
-            width: 300,
-            height: 300,
-            type: "div"
+            width: 100,
+            height: 100,
+            type: "div",
+            parent: null
         });
+        keyPressed = null;
         return;
     }
 
-    function handleOnLabelDelete(l) {
-        if(l) {
-            labelDelete(l);
+    function handleOnLabelDelete(id) {
+        if(id) {
+            labelDelete(id);
         }
         return;
     }
@@ -188,7 +144,6 @@ function AssetEditorCanvas(props) {
     }
 
     function labelDelete(l) {
-        console.log("label delete ... ", l);
         if(l) {
             props.onLabelDelete(l);
         }
@@ -212,39 +167,47 @@ function AssetEditorCanvas(props) {
     }
 
     function rl(l) {
-        // console.log("in canvas ... ", l.length, l)
         canvas.clear();
         canvas.remove();
         for(let i=0; i<l.length; i++) {
             const ele = l[i];
+            let text = ele["type"]
+            if(ele["parent"]) {
+                text = text + " - Child of " + ele["parent"]
+            }
+            const color = getDarkColor(i);
             const rect = new fabric.Rect({
                 id: ele["id"],
                 left: ele["coordinates"][0],
                 top: ele["coordinates"][1],
                 fill: "rgba(0,0,0,0)",
-                width: ele["coordinates"][2],
+                width: ele["coordinates"][2] - 2,
                 height: ele["coordinates"][3],
-                stroke: getDarkColor(i),
-                strokeWidth: 4,
+                stroke: color,
+                strokeWidth: 2,
                 selectable: true,
                 transparentCorners: false
             });
         
-            const text = new fabric.Textbox(ele["type"], {
-                left: rect.left + labelGap,
-                top: rect.top + labelGap,
+            const textBox = new fabric.Textbox(text, {
+                left: rect.left,
+                top: rect.top,
+                width: rect.width / 2,
                 fontFamily: "Inconsolata",
+                backgroundColor: color,
+                fill: "white",
                 fontSize: 20,
+                fontWeight: "bold",
                 selectable: true,
                 editable: true
             });
     
-            const group = new fabric.Group([rect, text], {
+            const group = new fabric.Group([rect, textBox], {
                 selectable: true
             });
 
-
             canvas.add(group);
+            group.sendBackwards()
             group.setCoords();
             canvas.renderAll();
 
