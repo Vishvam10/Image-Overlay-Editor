@@ -6,7 +6,7 @@ import "../App.css";
 function AssetEditorLabelInformation(props) {
 
     const labelData = props.labelData;
-    let id="", type="", coordinates="", dimensions="";
+    let id="", type="", coordinates="", dimensions="", parent="null";
     let info="", btn="";
 
     const inputRef = useRef();
@@ -34,6 +34,7 @@ function AssetEditorLabelInformation(props) {
     if(labelData) {
         id = labelData["id"];
         type = labelData["type"];
+        parent = labelData["parent"] == null ? "null" : labelData["parent"]
         coordinates = `(${labelData["coordinates"][0]}, ${labelData["coordinates"][1]})`;
         dimensions = `(${labelData["coordinates"][2]} x ${labelData["coordinates"][3]}) px`;
 
@@ -46,6 +47,10 @@ function AssetEditorLabelInformation(props) {
                 <span className="labelInformationSubGroup">
                     <h3 className="labelInformationHeader">TYPE</h3>
                     <p className="labelInformationDetail" contentEditable="true" onBlur={handleUpdateLabel} suppressContentEditableWarning={true}>{type}</p>
+                </span>
+                <span className="labelInformationSubGroup">
+                    <h3 className="labelInformationHeader">PARENT</h3>
+                    <p className="labelInformationDetail">{parent}</p>
                 </span>
                 <span className="labelInformationSubGroup">
                     <h3 className="labelInformationHeader">COORDINATES</h3>
