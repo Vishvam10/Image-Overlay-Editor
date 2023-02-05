@@ -142,11 +142,7 @@ function App() {
     const imgHeight = img.naturalWidth; 
     
     img = null;
-  
-    // console.log("aData : ", imgWidth, imgHeight)
-    // console.log("image : ", imgWidth, imgHeight)
-    // console.log("image dimensions : ", imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
-    
+      
     let sample = document.createElement("img");
     sample.src = aURL;
     sample.height = 200;
@@ -159,40 +155,43 @@ function App() {
       data = await getMLOutput();
       data = data.containers;
       data = assignID(data);
-      
-      console.log("Need ML pipeline", data);
       data = assignParent(data, null)
       data = flattenLabels(data)
       const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
       data = scaleAssetData(data, rd.scaleX, rd.scaleY);
-      
-      console.log("Need ML pipeline", data);
-  
+        
       aOptions = {
         scaleX: rd.scaleX,
         scaleY: rd.scaleY,
         width: Math.round(rd.width),
         height: Math.round(rd.height)
       }
-      console.log("resized dimensions : ", aOptions)
+      // console.log("resized dimensions : ", aOptions)
       
       setAssetData(data);
       setAssetOptions(aOptions);
-    }   
+    } else {
+      const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
+      aOptions = {
+        scaleX: rd.scaleX,
+        scaleY: rd.scaleY,
+        width: Math.round(rd.width),
+        height: Math.round(rd.height)
+      }
+      setAssetOptions(aOptions);
+    }
   }
 
   function exportJSON(data) {
     console.log("*************** JSON ****************")
     console.log(data)
     console.log("**************************************")
-    // alert("Saved ! Check console to see the updated data")
   }
 
   function exportYOLO(data, types) {
     console.log("*************** YOLO ****************")
     console.log("in yolo", data, types)
     console.log("**************************************")
-    // alert("Saved ! Check console to see the updated data")
   }
 
   function handleFileUpload(dataURL, mlOutput) {

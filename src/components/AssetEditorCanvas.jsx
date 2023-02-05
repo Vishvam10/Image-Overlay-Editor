@@ -23,7 +23,6 @@ function AssetEditorCanvas(props) {
     const assetOptions = props.assetOptions;
     const assetData = props.assetData;
     const canvasOptions = props.canvasOptions;
-    console.log("IN CANVAS : ", assetData, assetOptions)
 
     const [canvas, setCanvas] = useState(null);  
     const [labels, setLabels] = useState(null);  
@@ -168,8 +167,6 @@ function AssetEditorCanvas(props) {
                     stroke: color,
                     strokeWidth: 2,
                     selectable: true,
-                    centeredScaling: true,
-                    strokeUniform: true
                 });
                 
                 const textBox = new fabric.Textbox(text, {
@@ -181,16 +178,16 @@ function AssetEditorCanvas(props) {
                     fill: "white",
                     fontSize: 16,
                     fontWeight: "bold",
-                    strokeUniform: true
                 });
         
                 const group = new fabric.Group([rect, textBox], {
-                    selectable: true
+                    selectable: true,
+                    uniScaleTransform: true,
+                    lockUniScaling: false,
                 });
-    
+                
                 canvas.add(group);
                 group.sendBackwards()
-                group.setCoords();
                 canvas.renderAll()
     
                 // TODO
@@ -206,8 +203,10 @@ function AssetEditorCanvas(props) {
                 // })
     
                 group.on("mouseup", function(e) {
-                    const id = e.transform.target._objects[0]["id"];
-                    labelClick(id);
+                    if(e.transform) {
+                        const id = e.transform.target._objects[0]["id"];
+                        labelClick(id);
+                    }
                 })
         
                 group.on("modified", function(e) {
@@ -218,7 +217,7 @@ function AssetEditorCanvas(props) {
                         top: t.top,
                         width: t.width * t.scaleX,
                         height: t.height * t.scaleY,
-                    });
+                    });                    
                 });
             }
         }

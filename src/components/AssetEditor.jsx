@@ -49,8 +49,6 @@ function AssetEditor(props) {
   useEffect(() => {
   }, [assetImagePath]);
 
-  console.log("in editor : ", assetData)
-
   let canvasOptions = props.canvasOptions;
   let assetOptions = props.assetOptions;
 
@@ -262,8 +260,6 @@ function AssetEditor(props) {
     });
     setAssetData(temp);
   }
-
-  // console.log("in asset editor ...", assetData.length)
 
   return (
     <div className="assetEditor">
