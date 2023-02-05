@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { fabric } from "fabric";
 
 import "../App.css"
@@ -23,6 +23,7 @@ function AssetEditorCanvas(props) {
     const assetOptions = props.assetOptions;
     const assetData = props.assetData;
     const canvasOptions = props.canvasOptions;
+    console.log("IN CANVAS : ", assetData, assetOptions)
 
     const [canvas, setCanvas] = useState(null);  
     const [labels, setLabels] = useState(null);  
@@ -64,8 +65,15 @@ function AssetEditorCanvas(props) {
                 mouseX = Math.round(pointer.x);
                 mouseY = Math.round(pointer.y);
             })
+
+            canvas.on("mouse:down", (options) => {
+                if(!options.target) {
+                    // console.log("reached");
+                    labelClick(null);
+                }
+            })
         }
-    }, [labels])
+    }, [labels, assetImagePath])
 
     useEffect(() => {
         fabric.util.addListener(document.body, "keydown", function (options) {
@@ -142,75 +150,77 @@ function AssetEditorCanvas(props) {
     function rl(l) {
         canvas.clear();
         canvas.remove();
-        for(let i=0; i<l.length; i++) {
-            const ele = l[i];
-            let text = ele["type"]
-            if(ele["parent"]) {
-                text = text + " (parent : " + ele["parent"] + ")"
-            }
-            const color = getDarkColor(i);
-            const rect = new fabric.Rect({
-                id: ele["id"],
-                left: ele["coordinates"][0],
-                top: ele["coordinates"][1],
-                fill: "rgba(0,0,0,0)",
-                width: ele["coordinates"][2] - 2,
-                height: ele["coordinates"][3],
-                stroke: color,
-                strokeWidth: 2,
-                selectable: true,
-                centeredScaling: true,
-                strokeUniform: true
-            });
-            
-            const textBox = new fabric.Textbox(text, {
-                left: rect.left,
-                top: rect.top,
-                width: rect.width,
-                fontFamily: "Inconsolata",
-                backgroundColor: color,
-                fill: "white",
-                fontSize: 16,
-                fontWeight: "bold",
-                strokeUniform: true
-            });
-    
-            const group = new fabric.Group([rect, textBox], {
-                selectable: true
-            });
-
-            canvas.add(group);
-            group.sendBackwards()
-            group.setCoords();
-            canvas.renderAll()
-
-            // TODO
-            // group.on("scaling", function(e) {
-            //     // const t = e.transform.target;
-            //     console.log("rect resizing ...");
-            //     // labelResize(t.id, {
-            //     //     left: Math.round(t.left),
-            //     //     top: Math.round(t.top),
-            //     //     width: Math.round(t.width * t.scaleX),
-            //     //     height: Math.round(t.height * t.scaleY),
-            //     // });
-            // })
-
-            group.on("mouseup", function(e) {
-                const id = e.transform.target._objects[0]["id"];
-                labelClick(id);
-            })
-    
-            group.on("modified", function(e) {
-                let t = e.transform.target;
-                const rectTarget = t._objects[0];
-                labelModified(rectTarget.id, {
-                    left: t.left,
-                    top: t.top,
-                    width: t.width * t.scaleX,
-                    height: t.height * t.scaleY,
+        if(assetImagePath) {
+            for(let i=0; i<l.length; i++) {
+                const ele = l[i];
+                let text = ele["type"] 
+                if(ele["parent"]) {
+                    text = text + " (parent : " + ele["parent"] + ")"
+                }
+                const color = getDarkColor(i);
+                const rect = new fabric.Rect({
+                    id: ele["id"],
+                    left: ele["coordinates"][0],
+                    top: ele["coordinates"][1],
+                    fill: "rgba(0,0,0,0)",
+                    width: ele["coordinates"][2] - 2,
+                    height: ele["coordinates"][3],
+                    stroke: color,
+                    strokeWidth: 2,
+                    selectable: true,
+                    centeredScaling: true,
+                    strokeUniform: true
                 });
-            });
+                
+                const textBox = new fabric.Textbox(text, {
+                    left: rect.left,
+                    top: rect.top,
+                    width: rect.width,
+                    fontFamily: "Inconsolata",
+                    backgroundColor: color,
+                    fill: "white",
+                    fontSize: 16,
+                    fontWeight: "bold",
+                    strokeUniform: true
+                });
+        
+                const group = new fabric.Group([rect, textBox], {
+                    selectable: true
+                });
+    
+                canvas.add(group);
+                group.sendBackwards()
+                group.setCoords();
+                canvas.renderAll()
+    
+                // TODO
+                // group.on("scaling", function(e) {
+                //     // const t = e.transform.target;
+                //     console.log("rect resizing ...");
+                //     // labelResize(t.id, {
+                //     //     left: Math.round(t.left),
+                //     //     top: Math.round(t.top),
+                //     //     width: Math.round(t.width * t.scaleX),
+                //     //     height: Math.round(t.height * t.scaleY),
+                //     // });
+                // })
+    
+                group.on("mouseup", function(e) {
+                    const id = e.transform.target._objects[0]["id"];
+                    labelClick(id);
+                })
+        
+                group.on("modified", function(e) {
+                    let t = e.transform.target;
+                    const rectTarget = t._objects[0];
+                    labelModified(rectTarget.id, {
+                        left: t.left,
+                        top: t.top,
+                        width: t.width * t.scaleX,
+                        height: t.height * t.scaleY,
+                    });
+                });
+            }
         }
     }
 

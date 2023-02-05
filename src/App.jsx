@@ -1,12 +1,15 @@
+import { useEffect, useReducer, useState } from 'react';
+
 import AssetEditor from './components/AssetEditor';
-import assetImagePath from "./assets/img.png"
-import assetData from "./data.json"
+// import assetImagePath from "./assets/img.png"
+import tempAssetData from "./data.json"
 
 import './App.css';
 
-
 function assignID(labels) {
-
+  if(!labels) {
+    return;
+  }
   labels.forEach((ele) => {
     ele["id"] = Math.floor(Math.random() * 10000);
     if(ele["children"]) {
@@ -17,6 +20,9 @@ function assignID(labels) {
 }
 
 function assignParent(labels, parent) {
+  if(!labels) {
+    return;
+  }
   labels.forEach((ele) => {
     if(ele["children"]) {
       assignParent(ele["children"], ele["id"])
@@ -27,6 +33,9 @@ function assignParent(labels, parent) {
 }
 
 function flattenLabels(labels) {
+  if(!labels) {
+    return;
+  }
   return labels.reduce((acc, x) => {
     acc = acc.concat(x);
     if (x["children"]) {
@@ -37,14 +46,17 @@ function flattenLabels(labels) {
   }, []);
 }
 
-function scaleAssetData(data, scaleX, scaleY) {
-  data.forEach((ele) => {
+function scaleAssetData(labels, scaleX, scaleY) {
+  if(!labels) {
+    return;
+  }
+  labels.forEach((ele) => {
     ele["coordinates"][0] = Math.round(ele["coordinates"][0] * scaleX);
     ele["coordinates"][1] = Math.round(ele["coordinates"][1] * scaleY);
     ele["coordinates"][2] = Math.round(ele["coordinates"][2] * scaleX);
     ele["coordinates"][3] = Math.round(ele["coordinates"][3] * scaleY);
   }); 
-  return data;
+  return labels;
 }
 
 function calculateAspectRatioFit(imgWidth, imgHeight, canvasWidth, canvasHeight) {
@@ -54,49 +66,151 @@ function calculateAspectRatioFit(imgWidth, imgHeight, canvasWidth, canvasHeight)
   return { scaleX, scaleY, width: imgWidth*scaleX, height: imgHeight*scaleY };
 }
 
-function App() {
 
+const delay = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+function App() {
+  
+  const [assetURL, setAssetURL] = useState("");
+  const [assetData, setAssetData] = useState([]);
+  const [assetOptions, setAssetOptions] = useState({});
+  
   let canvasOptions = {
     width : 1000,
     height : 600  
   }
 
+  async function getMLOutput() {
+    const d = await delay(2000);
+    const dummyData = {
+      "containers": [
+          {
+              "coordinates": [
+                  12,
+                  43,
+                  500,
+                  22
+              ],
+              "type": "container"
+          },
+          {
+              "coordinates": [
+                  23,
+                  123,
+                  333,
+                  783
+              ],
+              "type": "container",
+              "children": [
+                  {
+                      "type": "image",
+                      "coordinates": [
+                          665,
+                          989,
+                          580,
+                          710
+                      ]
+                  }               
+              ]
+          },
+          {
+              "coordinates": [
+                  0,
+                  400,
+                  34,
+                  10
+              ],
+              "type": "container"
+          }
+      ]
+    }
+    return dummyData;
+  }
+  
+  async function init(aURL, mlOutput) {    
+    let canvasOptions = {
+      width : 1000,
+      height : 600  
+    }
+    let img = new Image();
+    img.src = aURL;
+    
+    const imgWidth = img.naturalWidth; 
+    const imgHeight = img.naturalWidth; 
+    
+    img = null;
+  
+    // console.log("aData : ", imgWidth, imgHeight)
+    // console.log("image : ", imgWidth, imgHeight)
+    // console.log("image dimensions : ", imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
+    
+    let sample = document.createElement("img");
+    sample.src = aURL;
+    sample.height = 200;
+    sample.width = 200;
+    document.body.appendChild(sample);
 
-  let img = new Image();
-  img.src = assetImagePath;
+    let data;
+    let aOptions;
+    if(mlOutput) {
+      data = await getMLOutput();
+      data = data.containers;
+      data = assignID(data);
+      
+      console.log("Need ML pipeline", data);
+      data = assignParent(data, null)
+      data = flattenLabels(data)
+      const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
+      data = scaleAssetData(data, rd.scaleX, rd.scaleY);
+      
+      console.log("Need ML pipeline", data);
   
-  const resizedDimensions = calculateAspectRatioFit(img.width, img.height, canvasOptions.width, canvasOptions.height);
-  
-  let data = assignID(assetData.containers);
-  data = assignParent(data, null)
-  data = flattenLabels(data)
-  data = scaleAssetData(data, resizedDimensions.scaleX, resizedDimensions.scaleY);
-
-  
-  let assetOptions = {
-    scaleX: resizedDimensions.scaleX,
-    scaleY: resizedDimensions.scaleY,
-    width: Math.round(resizedDimensions.width),
-    height: Math.round(resizedDimensions.height)
+      aOptions = {
+        scaleX: rd.scaleX,
+        scaleY: rd.scaleY,
+        width: Math.round(rd.width),
+        height: Math.round(rd.height)
+      }
+      console.log("resized dimensions : ", aOptions)
+      
+      setAssetData(data);
+      setAssetOptions(aOptions);
+    }   
   }
 
-  console.log(data);
-
-  function handleOnSave(data) {
-    console.log("*************** SAVED ****************")
+  function exportJSON(data) {
+    console.log("*************** JSON ****************")
     console.log(data)
     console.log("**************************************")
-    alert("Saved ! Check console to see the updated data")
+    // alert("Saved ! Check console to see the updated data")
+  }
+
+  function exportYOLO(data, types) {
+    console.log("*************** YOLO ****************")
+    console.log("in yolo", data, types)
+    console.log("**************************************")
+    // alert("Saved ! Check console to see the updated data")
+  }
+
+  function handleFileUpload(dataURL, mlOutput) {
+    console.log("in app : ", assetOptions); 
+    setAssetURL(dataURL);
+    init(dataURL, mlOutput);
   }
 
   return (
     <div className="app">
       <AssetEditor 
-        assetPath={assetImagePath} 
+        assetPath={assetURL} 
         assetOptions={assetOptions}
-        assetData={data}
+        assetData={assetData}
         canvasOptions={canvasOptions}
-        onSave={handleOnSave}
+        onExportJSON={exportJSON}
+        onExportYOLO={exportYOLO}
+        onFileUpload={handleFileUpload}
       />
     </div>
   );

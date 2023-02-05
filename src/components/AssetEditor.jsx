@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AssetEditorCanvas from "./AssetEditorCanvas";
 import AssetEditorLabelInformation from "./AssetEditorLabelInformation";
+import AssetEditorControls from "./AssetEditorControls";
 
 import "../App.css";
 
@@ -37,9 +38,18 @@ function inverseScaleAssetData(data, scaleX, scaleY) {
 
 function AssetEditor(props) {
   let assetImagePath = props.assetPath;
-  let [flattenedAssetData, setFlattenedAssetData] = useState(props.assetData);
 
+  const [assetData, setAssetData] = useState([]);
   const [currentLabel, setCurrentLabel] = useState();
+
+  useEffect(() => {
+    setAssetData(props.assetData);
+  }, [props.assetData])
+
+  useEffect(() => {
+  }, [assetImagePath]);
+
+  console.log("in editor : ", assetData)
 
   let canvasOptions = props.canvasOptions;
   let assetOptions = props.assetOptions;
@@ -59,7 +69,7 @@ function AssetEditor(props) {
     let min_y_diff_3 = 1000000; 
     let min_y_diff_4 = 1000000; 
 
-    flattenedAssetData.forEach((ele) => {
+    assetData.forEach((ele) => {
       const [xc, yc, wc, hc] = ele["coordinates"];
 
       const x_diff_1 = xl - xc;
@@ -143,15 +153,17 @@ function AssetEditor(props) {
   }
 
   function handleOnLabelClick(id) {
-    const label = getLabelByID(flattenedAssetData, id);
+    const label = getLabelByID(assetData, id);
     if (label) {
       setCurrentLabel(label);
+    } else {
+      setCurrentLabel(null);
     }
     return;
   }
 
   function handleLabelOnEdit(id, new_values) {
-    const label = getLabelByID(flattenedAssetData, id);
+    const label = getLabelByID(assetData, id);
     if (label) {
       label["coordinates"] = [
         Math.round(new_values["left"]),
@@ -166,14 +178,14 @@ function AssetEditor(props) {
 
   function handleLabelOnDelete(id) {
     if (id) {
-      setFlattenedAssetData(function (prev) {
+      setAssetData(function (prev) {
         return prev.filter((ele) => ele["id"] != id);
       });
     }
   }
 
   function handleLabelOnResize(id, new_values) {
-    // const label = getLabelByID(flattenedAssetData, id);
+    // const label = getLabelByID(assetData, id);
     // currentLabel["coordinates"] = [
     //   Math.round(new_values["left"]),
     //   Math.round(new_values["top"]),
@@ -189,25 +201,50 @@ function AssetEditor(props) {
     return;
   }
 
-  function handleSaveAndExit() {
+  function handleFileUpload(dataURL, mlOutput) {
+    props.onFileUpload(dataURL, mlOutput);
+  }
+
+  function handleExportJSON() {
     /*
           TODO : 1. Create a JSON structure from list and return it
       */
 
     const d = inverseScaleAssetData(
-      JSON.parse(JSON.stringify(flattenedAssetData)),
+      JSON.parse(JSON.stringify(assetData)),
       assetOptions.scaleX,
       assetOptions.scaleY
     );
 
-    props.onSave(d);
+    props.onExportJSON(d);
+  }
+  function handleExportYOLO() {
+    const d = inverseScaleAssetData(
+      JSON.parse(JSON.stringify(assetData)),
+      assetOptions.scaleX,
+      assetOptions.scaleY
+    );
+
+    let types = {}
+    let data = []
+    let count = 0
+    d.forEach((ele) => {
+      if(!types[ele["type"]]) {
+        types[ele["type"]] = count;
+        count += 1
+      } 
+      const [x, y, w, h] = ele["coordinates"];
+      data.push([types[ele["type"]], x, y, w, h]);
+    });
+    
+    props.onExportYOLO(data, types);
   }
 
   function handleOnLabelCreate(new_label) {
     if (new_label) {
-      if (isValidLabel(flattenedAssetData, new_label["id"])) {
+      if (isValidLabel(assetData, new_label["id"])) {
         assignParent(new_label);
-        setFlattenedAssetData(function (prev) {
+        setAssetData(function (prev) {
           return [...prev, new_label];
         });
       }
@@ -217,29 +254,33 @@ function AssetEditor(props) {
   }
 
   function handleLabelTypeChange(id, new_type) {
-    const temp = JSON.parse(JSON.stringify(flattenedAssetData));
+    const temp = JSON.parse(JSON.stringify(assetData));
     temp.forEach((ele) => {
       if (ele["id"] === id) {
         ele["type"] = new_type;
       }
     });
-    setFlattenedAssetData(temp);
+    setAssetData(temp);
   }
 
-  // console.log("in asset editor ...", flattenedAssetData.length)
+  // console.log("in asset editor ...", assetData.length)
 
   return (
     <div className="assetEditor">
       <AssetEditorLabelInformation
         labelData={currentLabel}
         onLabelTypeChange={handleLabelTypeChange}
-        onSaveAndExit={handleSaveAndExit}
+      />
+      <AssetEditorControls 
+        onExportJSON={handleExportJSON}
+        onExportYOLO={handleExportYOLO}
+        onFileUpload={handleFileUpload}
       />
       <AssetEditorCanvas
         canvasOptions={canvasOptions}
         assetImagePath={assetImagePath}
         assetOptions={assetOptions}
-        assetData={flattenedAssetData}
+        assetData={assetData}
         onLabelClick={handleOnLabelClick}
         onLabelEdit={handleLabelOnEdit}
         onLabelCreate={handleOnLabelCreate}

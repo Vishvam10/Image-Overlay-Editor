@@ -1,33 +1,16 @@
-
-import { useRef } from "react";
 import "../App.css";
 
 
 function AssetEditorLabelInformation(props) {
 
     const labelData = props.labelData;
-    let id="", type="", coordinates="", dimensions="", parent="null";
-    let info="", btn="";
-
-    const inputRef = useRef();
-
-    function handleOnSaveAndExit() {
-        props.onSaveAndExit(labelData);
-    }
+    let id="", type="", coordinates="", dimensions="", parent="null", info="";
 
     function handleUpdateLabel(e) {
         const type = String(e.target.innerText);
         if(type.length > 0) {
             labelData["type"] = type;
             props.onLabelTypeChange(labelData["id"], type);
-        }
-    }
-
-    function handleFileUpload() {
-        const inp = inputRef.current;
-        if(inp) {
-            console.log("input ref ...", inp)
-            // const formData = new FormData();
         }
     }
 
@@ -60,25 +43,13 @@ function AssetEditorLabelInformation(props) {
                     <h3 className="labelInformationHeader">DIMENSIONS</h3>
                     <p className="labelInformationDetail">{dimensions}</p>
                 </span>
-                {btn}
             </div>
         )
 
-       
     } else {
-        btn = (
-            <>
-                <button onClick={handleFileUpload} className="labelInformationButton">Upload File</button>
-                <div className="hideInput">
-                  <input id="upfile" type="file" ref={inputRef}/>
-                </div>
-                <button 
-                    className="labelInformationButton" 
-                    onClick={handleOnSaveAndExit}>Save and Exit
-                </button>
-            </>
-        )
-        info = btn
+        info = <span className="labelInformationSubGroup">
+                    <h3 className="labelInformationHeader">No label selected</h3>
+                </span>
     }
 
     return (
