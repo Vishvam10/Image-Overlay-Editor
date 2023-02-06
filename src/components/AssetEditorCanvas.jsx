@@ -166,7 +166,11 @@ function AssetEditorCanvas(props) {
                     height: ele["coordinates"][3],
                     stroke: color,
                     strokeWidth: 2,
-                    selectable: true,
+                    strokeUniform: true,
+                    selectable: false,
+                    noScaleCache: true,
+                    hasRotatingPoint: false,
+                    transparentCorners: false,
                 });
                 
                 const textBox = new fabric.Textbox(text, {
@@ -178,12 +182,22 @@ function AssetEditorCanvas(props) {
                     fill: "white",
                     fontSize: 16,
                     fontWeight: "bold",
+                    hasBorders: false,
+                    hasControls: false,
+                    lockScalingY: false
                 });
-        
+
                 const group = new fabric.Group([rect, textBox], {
+                    left: rect.left,
+                    width: rect.width,
+                    height: rect.height,
+                    lockScalingFlip: true,
+                    hasControls: true,
+                    hasRotatingPoint: false,
+                    transparentCorners: false,
                     selectable: true,
-                    uniScaleTransform: true,
-                    lockUniScaling: false,
+                    cornerSize: 8,
+                    objectCaching: false,
                 });
                 
                 canvas.add(group);
@@ -201,6 +215,22 @@ function AssetEditorCanvas(props) {
                 //     //     height: Math.round(t.height * t.scaleY),
                 //     // });
                 // })
+
+                group.on('scaling', function () {
+                    // console.log("rect : ", this._objects[1])
+                    if (this.scaleX < 1) {
+                      this._objects[1].scaleX = 1 + (1 - this.scaleX)
+                    }
+                    else {
+                        this._objects[1].scaleX = 1 / (this.scaleX)
+                    }
+                    if (this.scaleY < 1) {
+                        this._objects[1].scaleY = 1 + (1 - this.scaleY)
+                    }
+                    else {
+                        this._objects[1].scaleY = 1 / (this.scaleY)
+                    }
+                })
     
                 group.on("mouseup", function(e) {
                     if(e.transform) {
