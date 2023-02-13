@@ -216,6 +216,7 @@ function AssetEditor(props) {
 
     props.onExportJSON(d);
   }
+
   function handleExportYOLO() {
     const d = inverseScaleAssetData(
       JSON.parse(JSON.stringify(assetData)),
@@ -263,15 +264,21 @@ function AssetEditor(props) {
 
   return (
     <div className="assetEditor">
-      <AssetEditorLabelInformation
-        labelData={currentLabel}
-        onLabelTypeChange={handleLabelTypeChange}
-      />
-      <AssetEditorControls 
-        onExportJSON={handleExportJSON}
-        onExportYOLO={handleExportYOLO}
-        onFileUpload={handleFileUpload}
-      />
+      <div className="assetSidePanel">
+        <div className="row">
+          <AssetEditorLabelInformation
+            labelData={currentLabel}
+            onLabelTypeChange={handleLabelTypeChange}
+          />
+        </div>
+        <div className="row">
+          <AssetEditorControls 
+            onExportJSON={handleExportJSON}
+            onExportYOLO={handleExportYOLO}
+            onFileUpload={handleFileUpload}
+          />
+        </div>
+      </div>
       <AssetEditorCanvas
         canvasOptions={canvasOptions}
         assetImagePath={assetImagePath}

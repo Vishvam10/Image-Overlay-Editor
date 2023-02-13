@@ -36,19 +36,19 @@ function AssetEditorControls(props) {
     function handleExportYOLO() {
         props.onExportYOLO();
     }
-
-
     
     let btn = (
-        <>
-            <button onClick={simulateClick} className="labelInformationButton">Upload File</button>
-            <div className="hideInput">
-              <input id="upfile" type="file" ref={inputRef} onChange={handleFileUpload}/>
+        <div className="assetEditorControls">
+            <div className="fileUploadContainer">
+                <div className="hideInput">
+                    <input id="upfile" type="file" ref={inputRef} onChange={handleFileUpload}/>
+                </div>
+                <label className="switch" htmlFor="mlOutput" > API ?
+                    <input id="mlOutput" type="checkbox" ref={mlOutputRef}/>
+                    <span className="slider round"></span>
+                </label>
+                <button onClick={simulateClick} className="labelInformationButton">Upload File</button>
             </div>
-            <label className="switch"> ML Output
-                <input id="mlOutput" type="checkbox" ref={mlOutputRef}/>
-                <span className="slider round"></span>
-            </label>
             <button 
                 className="labelInformationButton" 
                 onClick={handleExportJSON}>Export as JSON
@@ -57,13 +57,13 @@ function AssetEditorControls(props) {
                 className="labelInformationButton" 
                 onClick={handleExportYOLO}>Export as YOLO
             </button>
-        </>
+        </div>
     )
 
     return (
-        <div className="vc">
+        <>
             {btn}
-        </div>
+        </>
     )
 
 }

@@ -54,7 +54,7 @@ function AssetEditorLabelInformation(props) {
 
     return (
         <div className="assetEditorLabelInformation">
-            <h1 className="assetEditorLabelInformationHeading">Label Information</h1>
+            <h2 className="assetEditorLabelInformationHeading">Label Information</h2>
             {info}
         </div>
     )
