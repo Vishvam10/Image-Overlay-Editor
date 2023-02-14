@@ -6,7 +6,7 @@ import AssetEditorControls from "./AssetEditorControls";
 import "../App.css";
 
 function getLabelByID(labels, id) {
-  let l;
+  let l = null;
   labels.forEach((ele) => {
     if (ele["id"] === id) {
       l = ele;
@@ -14,17 +14,6 @@ function getLabelByID(labels, id) {
   });
   return l;
 }
-
-function isValidLabel(labels, id) {
-  labels.forEach((ele) => {
-    if (ele["id"] === id) {
-      return false;
-    }
-  });
-
-  return true;
-}
-
 
 function inverseScaleAssetData(data, scaleX, scaleY) {
   data.forEach((ele) => {
@@ -66,7 +55,8 @@ function AssetEditor(props) {
 
     let min_y_diff_3 = 1000000; 
     let min_y_diff_4 = 1000000; 
-
+    
+    // console.log("Reached : ", new_label, assetData);
     assetData.forEach((ele) => {
       const [xc, yc, wc, hc] = ele["coordinates"];
 
@@ -145,18 +135,13 @@ function AssetEditor(props) {
           new_label["parent"] = ele["id"]
         }
       }
-
-    
     });
   }
 
   function handleOnLabelClick(id) {
+    // console.log("in label click : ", assetData)
     const label = getLabelByID(assetData, id);
-    if (label) {
-      setCurrentLabel(label);
-    } else {
-      setCurrentLabel(null);
-    }
+    setCurrentLabel(label);
     return;
   }
 
@@ -203,10 +188,30 @@ function AssetEditor(props) {
     props.onFileUpload(dataURL, mlOutput);
   }
 
+  function handleOnLabelCreate(new_label) {
+    console.log("in create label : ", assetData)
+    if(new_label) {
+        setAssetData(function (prev) {
+          return [...prev, new_label];
+        });
+        assignParent(new_label);
+    }
+    const temp = currentLabel;
+    setCurrentLabel(temp);
+    return;
+  }
+
+  function handleLabelTypeChange(id, new_type) {
+    const temp = JSON.parse(JSON.stringify(assetData));
+    temp.forEach((ele) => {
+      if (ele["id"] === id) {
+        ele["type"] = new_type;
+      }
+    });
+    setAssetData(temp);
+  }
+
   function handleExportJSON() {
-    /*
-          TODO : 1. Create a JSON structure from list and return it
-      */
 
     const d = inverseScaleAssetData(
       JSON.parse(JSON.stringify(assetData)),
@@ -239,28 +244,7 @@ function AssetEditor(props) {
     props.onExportYOLO(data, types);
   }
 
-  function handleOnLabelCreate(new_label) {
-    if (new_label) {
-      if (isValidLabel(assetData, new_label["id"])) {
-        assignParent(new_label);
-        setAssetData(function (prev) {
-          return [...prev, new_label];
-        });
-      }
-    }
-    const temp = currentLabel;
-    setCurrentLabel(temp);
-  }
-
-  function handleLabelTypeChange(id, new_type) {
-    const temp = JSON.parse(JSON.stringify(assetData));
-    temp.forEach((ele) => {
-      if (ele["id"] === id) {
-        ele["type"] = new_type;
-      }
-    });
-    setAssetData(temp);
-  }
+  console.log("in asset editor")
 
   return (
     <div className="assetEditor">

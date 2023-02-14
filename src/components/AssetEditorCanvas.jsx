@@ -76,6 +76,7 @@ function AssetEditorCanvas(props) {
 
     useEffect(() => {
         fabric.util.addListener(document.body, "keydown", function (options) {
+            console.log("reached")
             if (options.repeat) {
                 return;
             }
@@ -84,6 +85,7 @@ function AssetEditorCanvas(props) {
 
             if(canvas) {
                 if((options.key === "c") && (options.keyCode === 67)) {
+                    console.log("reached label create")
                     handleOnLabelCreate(mouseX, mouseY);
                     keyPressed = null;
                 } else if((options.key === "d") && (options.keyCode === 68)) {
@@ -177,14 +179,13 @@ function AssetEditorCanvas(props) {
                     left: rect.left,
                     top: rect.top,
                     width: rect.width,
-                    fontFamily: "Inconsolata",
+                    fontFamily: "monospace",
                     backgroundColor: color,
                     fill: "white",
                     fontSize: 16,
                     fontWeight: "bold",
                     hasBorders: false,
                     hasControls: false,
-                    lockScalingY: false
                 });
 
                 const group = new fabric.Group([rect, textBox], {
@@ -201,7 +202,7 @@ function AssetEditorCanvas(props) {
                 });
                 
                 canvas.add(group);
-                group.sendBackwards()
+                // group.sendBackwards()
                 canvas.renderAll()
     
                 // TODO

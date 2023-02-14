@@ -106,6 +106,16 @@ function exportToCSV(filename, rows) {
   }
 }
 
+function exportToJSON(obj, filename){
+  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+  let link = document.createElement('a');
+  link.setAttribute("href",     dataStr);
+  link.setAttribute("download", filename + ".json");
+  document.body.appendChild(link); // required for firefox
+  link.click();
+  link.remove();
+}
+
 
 const delay = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -226,13 +236,15 @@ function App() {
     console.log("*************** JSON ****************")
     console.log(data)
     console.log("**************************************")
+    exportToJSON(data, "data")
   }
 
   function exportYOLO(data, types) {
-    // console.log("*************** YOLO ****************")
     let t = Object.keys(types).map((key) => [types[key], key])
-    // console.log("in yolo", data, t)
-    // console.log("**************************************")
+
+    console.log("*************** YOLO ****************")
+    console.log("in yolo", data, t)
+    console.log("**************************************")
 
     exportToCSV("yolo", data);
     exportToCSV("types", t)

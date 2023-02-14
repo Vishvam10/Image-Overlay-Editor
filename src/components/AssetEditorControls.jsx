@@ -49,14 +49,33 @@ function AssetEditorControls(props) {
                 </label>
                 <button onClick={simulateClick} className="labelInformationButton">Upload File</button>
             </div>
-            <button 
-                className="labelInformationButton" 
-                onClick={handleExportJSON}>Export as JSON
-            </button>
-            <button 
-                className="labelInformationButton" 
-                onClick={handleExportYOLO}>Export as YOLO
-            </button>
+            <div className="exportContainer">
+                <button 
+                    className="labelInformationButton" 
+                    >
+                    <ion-icon name="arrow-up-outline"></ion-icon>
+                    JSON
+                </button>
+                <button 
+                    className="labelInformationButton" 
+                    onClick={handleExportJSON}>
+                    <ion-icon name="arrow-down-outline"></ion-icon>
+                    JSON
+                </button>
+            </div>
+            <div className="exportContainer">
+                <button 
+                    className="labelInformationButton">
+                    <ion-icon name="arrow-up-outline"></ion-icon>
+                    YOLO
+                </button>
+                <button 
+                    className="labelInformationButton" 
+                    onClick={handleExportYOLO}>
+                    <ion-icon name="arrow-down-outline"></ion-icon>
+                    YOLO
+                </button>
+            </div>
         </div>
     )
 
