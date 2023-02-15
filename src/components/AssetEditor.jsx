@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AssetEditorCanvas from "./AssetEditorCanvas";
 import AssetEditorLabelInformation from "./AssetEditorLabelInformation";
 import AssetEditorControls from "./AssetEditorControls";
 
+import assignParent from "./../utils/assignParent";
+
 import "../App.css";
 
-function getLabelByID(labels, id) {
+
+
+function getLabelByID(assetData, id) {
   let l = null;
-  labels.forEach((ele) => {
+  assetData.current.forEach((ele) => {
     if (ele["id"] === id) {
       l = ele;
     }
@@ -28,11 +32,11 @@ function inverseScaleAssetData(data, scaleX, scaleY) {
 function AssetEditor(props) {
   let assetImagePath = props.assetPath;
 
-  const [assetData, setAssetData] = useState([]);
+  const assetData = useRef(props.assetData);
   const [currentLabel, setCurrentLabel] = useState();
 
   useEffect(() => {
-    setAssetData(props.assetData);
+    assetData.current = props.assetData;
   }, [props.assetData])
 
   useEffect(() => {
@@ -41,147 +45,43 @@ function AssetEditor(props) {
   let canvasOptions = props.canvasOptions;
   let assetOptions = props.assetOptions;
 
-  function assignParent(new_label) {
-    const [xl, yl, wl, hl] = new_label["coordinates"];
-
-    let min_x_diff_1 = 1000000;
-    let min_x_diff_2 = 1000000; 
-
-    let min_x_diff_3 = 1000000; 
-    let min_x_diff_4 = 1000000; 
-
-    let min_y_diff_1 = 1000000; 
-    let min_y_diff_2 = 1000000; 
-
-    let min_y_diff_3 = 1000000; 
-    let min_y_diff_4 = 1000000; 
-    
-    // console.log("Reached : ", new_label, assetData);
-    assetData.forEach((ele) => {
-      const [xc, yc, wc, hc] = ele["coordinates"];
-
-      const x_diff_1 = xl - xc;
-      const x_diff_2 = xl - xc - wc;
-
-      const x_diff_3 = xl + wl - xc;
-      const x_diff_4 = xl + wl - xc - wc;
-
-      const y_diff_1 = yl - yc;
-      const y_diff_2 = yl - yc - hc;
-
-      const y_diff_3 = yl + hl - yc;
-      const y_diff_4 = yl + hl - yc - hc;
-
-      let temp = 0;
-
-      if (
-        x_diff_1 >= 0 &&
-        x_diff_2 <= 0 &&
-        y_diff_1 >= 0 &&
-        y_diff_2 <= 0 &&
-        x_diff_3 >= 0 &&
-        x_diff_4 <= 0 &&
-        y_diff_1 >= 0 &&
-        y_diff_2 <= 0 &&
-        x_diff_3 >= 0 &&
-        x_diff_4 <= 0 &&
-        y_diff_3 >= 0 &&
-        y_diff_4 <= 0 &&
-        x_diff_1 >= 0 &&
-        x_diff_2 <= 0 &&
-        y_diff_3 >= 0 &&
-        y_diff_4 <= 0
-      ) {
-        new_label["parent"] = ele["id"]
-
-        if(x_diff_1 < min_x_diff_1) {
-          min_x_diff_1 = x_diff_1;
-          temp += 1
-        }
-        if(x_diff_2 < min_x_diff_2) {
-          min_x_diff_2 = x_diff_2;
-          temp += 1
-        }
-
-        if(x_diff_3 < min_x_diff_3) {
-          min_x_diff_3 = x_diff_3;
-          temp += 1
-        }
-        if(x_diff_4 < min_x_diff_4) {
-          min_x_diff_4 = x_diff_4;
-          temp += 1
-        }
-
-        if(y_diff_1 < min_y_diff_1) {
-          min_y_diff_1 = y_diff_1;
-          temp += 1
-        }
-        if(y_diff_2 < min_y_diff_2) {
-          min_y_diff_2 = y_diff_2;
-          temp += 1
-        }
-
-        if(y_diff_3 < min_y_diff_3) {
-          min_y_diff_3 = y_diff_3;
-          temp += 1
-        }
-
-        if(y_diff_4 < min_y_diff_4) {
-          min_y_diff_4 = y_diff_4;
-          temp += 1
-        }
-
-        if(temp == 8) {
-          new_label["parent"] = ele["id"]
-        }
-      }
-    });
-  }
-
   function handleOnLabelClick(id) {
-    // console.log("in label click : ", assetData)
     const label = getLabelByID(assetData, id);
     setCurrentLabel(label);
     return;
   }
 
   function handleLabelOnEdit(id, new_values) {
-    const label = getLabelByID(assetData, id);
-    if (label) {
-      label["coordinates"] = [
-        Math.round(new_values["left"]),
-        Math.round(new_values["top"]),
-        Math.round(new_values["width"]),
-        Math.round(new_values["height"]),
-      ];
-      setCurrentLabel(label);
+    const temp = JSON.parse(JSON.stringify(assetData.current));
+    let label;
+    for(let ele of temp) {
+      if(ele["id"] === id) {
+        ele["coordinates"] = [
+          Math.round(new_values["left"]),
+          Math.round(new_values["top"]),
+          Math.round(new_values["width"]),
+          Math.round(new_values["height"]),
+        ];
+        label = ele;
+        break;
+      }
     }
+    temp.forEach((ele) => {
+      assignParent(assetData.current, ele)
+    })
+    assetData.current = temp;
+    setCurrentLabel(label);
     return;
   }
-
+  
   function handleLabelOnDelete(id) {
     if (id) {
-      setAssetData(function (prev) {
-        return prev.filter((ele) => ele["id"] != id);
-      });
+      const temp = assetData.current.filter((ele) => ele["id"] != id);
+      temp.forEach((ele) => {
+        assignParent(temp, ele, "deleted")
+      })
+      assetData.current = temp;
     }
-  }
-
-  function handleLabelOnResize(id, new_values) {
-    // const label = getLabelByID(assetData, id);
-    // currentLabel["coordinates"] = [
-    //   Math.round(new_values["left"]),
-    //   Math.round(new_values["top"]),
-    //   Math.round(new_values["width"]),
-    //   Math.round(new_values["height"])
-    // ]
-    // setCurrentLabel(label);
-    // let curLabel = {...currentLabel}
-    // someProperty.flag = true;
-    // this.setState({someProperty})
-    // setCurrentLabel(label);
-    // console.log("resizing... : ", id);
-    return;
   }
 
   function handleFileUpload(dataURL, mlOutput) {
@@ -189,37 +89,39 @@ function AssetEditor(props) {
   }
 
   function handleOnLabelCreate(new_label) {
-    console.log("in create label : ", assetData)
     if(new_label) {
-        setAssetData(function (prev) {
-          return [...prev, new_label];
-        });
-        assignParent(new_label);
+      const temp = [...assetData.current, new_label];
+      temp.forEach((ele) => {
+        assignParent(assetData.current, ele)
+      })
+      assetData.current = temp;
+      setCurrentLabel(new_label);
     }
-    const temp = currentLabel;
-    setCurrentLabel(temp);
     return;
   }
 
   function handleLabelTypeChange(id, new_type) {
-    const temp = JSON.parse(JSON.stringify(assetData));
+    const temp = JSON.parse(JSON.stringify(assetData.current));
     temp.forEach((ele) => {
       if (ele["id"] === id) {
         ele["type"] = new_type;
       }
     });
-    setAssetData(temp);
+    assetData.current = temp;
   }
 
   function handleExportJSON() {
 
     const d = inverseScaleAssetData(
-      JSON.parse(JSON.stringify(assetData)),
+      JSON.parse(JSON.stringify(assetData.current)),
       assetOptions.scaleX,
       assetOptions.scaleY
     );
 
-    props.onExportJSON(d);
+    const JSONData = {
+      "containers" : d
+    }
+    props.onExportJSON(JSON.stringify(JSONData));
   }
 
   function handleExportYOLO() {
@@ -243,8 +145,6 @@ function AssetEditor(props) {
     
     props.onExportYOLO(data, types);
   }
-
-  console.log("in asset editor")
 
   return (
     <div className="assetEditor">
@@ -272,7 +172,6 @@ function AssetEditor(props) {
         onLabelEdit={handleLabelOnEdit}
         onLabelCreate={handleOnLabelCreate}
         onLabelDelete={handleLabelOnDelete}
-        onLabelResize={handleLabelOnResize}
       />
     </div>
   );

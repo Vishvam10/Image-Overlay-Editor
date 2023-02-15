@@ -39,7 +39,7 @@ label {
 }
 
 canvas {
-  border: 2px solid black;
+  border: 1px solid #cacaca;
 }
 
 ion-icon {
@@ -52,7 +52,6 @@ ion-icon {
   width: 100vw;
   height: 100vh;
 }
-
 
 .assetEditor {
   background-color: #fafafa;
@@ -70,6 +69,7 @@ ion-icon {
 }
 
 .assetEditorLabelInformation {
+  width: 24rem;
   border-radius: 2rem;
   padding: 2rem;
   margin: -2rem 0rem 0rem 0rem;
@@ -88,28 +88,40 @@ ion-icon {
   border-radius: 1.2rem;
   padding: 2rem;
   background-color: #ffffff;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  box-shadow: rgba(187, 195, 204, 0.2) 0px 8px 24px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
 .assetEditorLabelInformationHeading {
-  margin: 0rem 0rem 4rem 0rem;
   color: rgb(132, 132, 132);
   text-align: left;
+  margin: 1rem 0rem 2rem 4rem;
+  color: rgb(132, 132, 132);
+  text-align: left;
+  font-size: 1.4rem;
+  font-weight: bold;
 }
 
 .labelInformationGroup {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  margin: 0rem -1rem 0rem 0rem;
+  overflow-y: scroll;
 }
 
 .labelInformationSubGroup {
   display: flex;
   flex-direction: column;
-  margin: 0rem 0rem 2rem 0rem;
+  margin: 0rem 0rem 1,2rem 0rem;
+  background-color: #f4f4f4;
+  box-shadow: rgba(187, 195, 204, 0.2) 0px 8px 24px;
+  border: 1px solid #cacaca;
+  width: 20rem;
+  padding: 1rem;
+  border-radius: 1.2rem;
 }
 
 .labelInformationHeader {
@@ -118,9 +130,26 @@ ion-icon {
 }
 
 .labelInformationDetail {
-  font-size: 2rem;
-  margin: -0.4rem 0rem 0rem 0rem;
+  font-size: 1.6rem;
+  margin: 0rem 0rem 0rem 0rem;
   color: rgb(91, 91, 91);
+}
+
+.labelInformationButton {
+  height: 4rem;
+  width: 100%;
+  margin: 1rem 0rem 1rem 0rem;
+  background-color: #f4f4f4;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  border: 1px solid #cacaca;
+  border-radius: 1.2rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 1.2rem;
+  color: rgb(82, 82, 82);
+  padding: 1.2rem;
 }
 
 .assetEditorCanvas {
@@ -140,23 +169,6 @@ ion-icon {
 .overlayCanvas {
   position: absolute !important;
   z-index: 1000;
-}
-
-.labelInformationButton {
-  height: 4rem;
-  width: 100%;
-  margin: 1rem 0rem 1rem 0rem;
-  background-color: #ededed;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  border: 1px solid #cacaca;
-  border-radius: 1.2rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  font-size: 1.2rem;
-  color: rgb(82, 82, 82);
-  padding: 1.2rem;
 }
 
 .fileUploadContainer {

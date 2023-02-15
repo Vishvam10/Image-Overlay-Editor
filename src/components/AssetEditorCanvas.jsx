@@ -21,7 +21,7 @@ function AssetEditorCanvas(props) {
 
     const assetImagePath = props.assetImagePath;
     const assetOptions = props.assetOptions;
-    const assetData = props.assetData;
+    const assetData = props.assetData.current;
     const canvasOptions = props.canvasOptions;
 
     const [canvas, setCanvas] = useState(null);  
@@ -67,7 +67,6 @@ function AssetEditorCanvas(props) {
 
             canvas.on("mouse:down", (options) => {
                 if(!options.target) {
-                    // console.log("reached");
                     labelClick(null);
                 }
             })
@@ -76,7 +75,6 @@ function AssetEditorCanvas(props) {
 
     useEffect(() => {
         fabric.util.addListener(document.body, "keydown", function (options) {
-            console.log("reached")
             if (options.repeat) {
                 return;
             }
@@ -85,7 +83,6 @@ function AssetEditorCanvas(props) {
 
             if(canvas) {
                 if((options.key === "c") && (options.keyCode === 67)) {
-                    console.log("reached label create")
                     handleOnLabelCreate(mouseX, mouseY);
                     keyPressed = null;
                 } else if((options.key === "d") && (options.keyCode === 68)) {
@@ -156,7 +153,7 @@ function AssetEditorCanvas(props) {
                 const ele = l[i];
                 let text = ele["type"] 
                 if(ele["parent"]) {
-                    text = text + " (parent : " + ele["parent"] + ")"
+                    text = ele["parent"] + " > " + text; 
                 }
                 const color = getDarkColor(i);
                 const rect = new fabric.Rect({
@@ -179,6 +176,7 @@ function AssetEditorCanvas(props) {
                     left: rect.left,
                     top: rect.top,
                     width: rect.width,
+                    height: 10,
                     fontFamily: "monospace",
                     backgroundColor: color,
                     fill: "white",
@@ -202,23 +200,9 @@ function AssetEditorCanvas(props) {
                 });
                 
                 canvas.add(group);
-                // group.sendBackwards()
                 canvas.renderAll()
-    
-                // TODO
-                // group.on("scaling", function(e) {
-                //     // const t = e.transform.target;
-                //     console.log("rect resizing ...");
-                //     // labelResize(t.id, {
-                //     //     left: Math.round(t.left),
-                //     //     top: Math.round(t.top),
-                //     //     width: Math.round(t.width * t.scaleX),
-                //     //     height: Math.round(t.height * t.scaleY),
-                //     // });
-                // })
 
                 group.on('scaling', function () {
-                    // console.log("rect : ", this._objects[1])
                     if (this.scaleX < 1) {
                       this._objects[1].scaleX = 1 + (1 - this.scaleX)
                     }

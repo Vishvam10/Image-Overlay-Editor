@@ -1,8 +1,6 @@
 import { useEffect, useReducer, useState } from 'react';
 
 import AssetEditor from './components/AssetEditor';
-// import assetImagePath from "./assets/img.png"
-import tempAssetData from "./data.json"
 
 import './App.css';
 
@@ -66,6 +64,51 @@ function calculateAspectRatioFit(imgWidth, imgHeight, canvasWidth, canvasHeight)
   return { scaleX, scaleY, width: imgWidth*scaleX, height: imgHeight*scaleY };
 }
 
+function groupSimilarLabels(labels) {
+  let groupedData = [];
+  let mp = {} 
+  labels.forEach((ele, ind) => {
+    const [x, y, w, h] = ele["coordinates"];
+    const s = `x${x}_y${y}_w${w}_h${h}`;
+    if(!(s in mp)) {
+      if(ele["text"]) {
+        mp[s] = ele["text"]
+      } else {
+        mp[s] = ""
+      }
+      groupedData.push(ele);
+    } else {
+      if(ele["text"]) {
+        mp[s] = mp[s] + " " + ele["text"]
+      }
+    }
+  });
+
+  for(const key in mp) { 
+    let coordinates = key.split("_")
+    const [x, y, w, h] = [
+      Number(coordinates[0].substring(1)), 
+      Number(coordinates[1].substring(1)), 
+      Number(coordinates[2].substring(1)), 
+      Number(coordinates[3].substring(1))
+    ] 
+
+    groupedData.forEach((ele) => {
+      if(
+        ele["coordinates"][0] == x && 
+        ele["coordinates"][1] == y &&
+        ele["coordinates"][2] == w &&
+        ele["coordinates"][3] == h
+      ) {
+        ele["text"] = mp[key];
+      }
+    });
+    
+  }
+
+  return groupedData;
+}
+
 function exportToCSV(filename, rows) {
   var processRow = function (row) {
       var finalVal = '';
@@ -107,20 +150,23 @@ function exportToCSV(filename, rows) {
 }
 
 function exportToJSON(obj, filename){
-  let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
-  let link = document.createElement('a');
-  link.setAttribute("href",     dataStr);
-  link.setAttribute("download", filename + ".json");
-  document.body.appendChild(link); // required for firefox
+  let link = document.createElement("a");
+  link.href = URL.createObjectURL(
+    new Blob([
+      JSON.stringify(obj)
+    ]),
+    {
+      type:"application/json"
+    }
+  )
+  link.download = filename + ".json";
   link.click();
   link.remove();
 }
 
-
 const delay = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
 
 function App() {
   
@@ -134,49 +180,22 @@ function App() {
   }
 
   async function getMLOutput() {
-    const d = await delay(2000);
-    const dummyData = {
-      "containers": [
-          {
-              "coordinates": [
-                  12,
-                  43,
-                  500,
-                  22
-              ],
-              "type": "container"
-          },
-          {
-              "coordinates": [
-                  23,
-                  123,
-                  333,
-                  783
-              ],
-              "type": "container",
-              "children": [
-                  {
-                      "type": "image",
-                      "coordinates": [
-                          665,
-                          989,
-                          580,
-                          710
-                      ]
-                  }               
-              ]
-          },
-          {
-              "coordinates": [
-                  0,
-                  400,
-                  34,
-                  10
-              ],
-              "type": "container"
-          }
-      ]
-    }
+    const d = delay(1000)
+    const dummyData = JSON.parse("{\"containers\": [{\"coordinates\": [0, 0, 800, 48], \"type\": \"container\", \"children\": [{\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Home\"}, {\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Portfo 0\"}, {\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Team\"}]}, {\"coordinates\": [0, 46, 800, 416], \"type\": \"container\", \"children\": [{\"type\": \"image\", \"coordinates\": [411, 134, 325, 245]}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"Grow your business\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"with Vesperr\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"We are team of talanted designers making\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"websites with Bootstrap\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"Get Started\"}]}, {\"coordinates\": [0, 460, 800, 139], \"type\": \"container\", \"children\": [{\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"citrus\"}, {\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"Trustly\"}, {\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"myob\"}]}]}")
+    // let data = await fetch("./data.json");
+    // console.log("ml data : ", data)
+    // const formData = new FormData()
+    // formData.append("img", "@\"")
+
+    // const data = await fetch("http://ec2-54-145-197-243.compute-1.amazonaws.com:8000/get_coordinates_from_image_object", {
+    //   formData,
+    //   headers: {
+    //     "Content-Type": "multipart/form-data"
+    //   },
+    //   method: "POST"
+    // });
+
+    // console.log("ML data : ", data)
     return dummyData;
   }
   
@@ -192,21 +211,16 @@ function App() {
     const imgHeight = img.naturalWidth; 
     
     img = null;
-      
-    let sample = document.createElement("img");
-    sample.src = aURL;
-    sample.height = 200;
-    sample.width = 200;
-    document.body.appendChild(sample);
 
-    let data;
+    let data = [];
     let aOptions;
     if(mlOutput) {
-      data = await getMLOutput();
+      data = await getMLOutput(aURL);
       data = data.containers;
       data = assignID(data);
-      data = assignParent(data, null)
-      data = flattenLabels(data)
+      data = assignParent(data, null);
+      data = flattenLabels(data);
+      data = groupSimilarLabels(data);
       const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
       data = scaleAssetData(data, rd.scaleX, rd.scaleY);
         
@@ -216,7 +230,6 @@ function App() {
         width: Math.round(rd.width),
         height: Math.round(rd.height)
       }
-      // console.log("resized dimensions : ", aOptions)
       
       setAssetData(data);
       setAssetOptions(aOptions);

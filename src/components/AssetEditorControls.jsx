@@ -13,7 +13,6 @@ function AssetEditorControls(props) {
     }
 
     function handleFileUpload(e) {
-        console.log("input chagned", e.target.files);
         const mlOutput = mlOutputRef.current;
         
         let file;

@@ -4,7 +4,7 @@ import "../App.css";
 function AssetEditorLabelInformation(props) {
 
     const labelData = props.labelData;
-    let id="", type="", coordinates="", dimensions="", parent="null", info="";
+    let id="", type="", coordinates="", dimensions="", text="", parent="null", info="";
 
     function handleUpdateLabel(e) {
         const type = String(e.target.innerText);
@@ -18,6 +18,7 @@ function AssetEditorLabelInformation(props) {
         id = labelData["id"];
         type = labelData["type"];
         parent = labelData["parent"] == null ? "null" : labelData["parent"]
+        text = labelData["text"] == null ? "null" : labelData["text"]
         coordinates = `(${labelData["coordinates"][0]}, ${labelData["coordinates"][1]})`;
         dimensions = `(${labelData["coordinates"][2]} x ${labelData["coordinates"][3]}) px`;
 
@@ -34,6 +35,10 @@ function AssetEditorLabelInformation(props) {
                 <span className="labelInformationSubGroup">
                     <h3 className="labelInformationHeader">PARENT</h3>
                     <p className="labelInformationDetail">{parent}</p>
+                </span>
+                <span className="labelInformationSubGroup">
+                    <h3 className="labelInformationHeader">TEXT</h3>
+                    <p className="labelInformationDetail">{text}</p>
                 </span>
                 <span className="labelInformationSubGroup">
                     <h3 className="labelInformationHeader">COORDINATES</h3>
