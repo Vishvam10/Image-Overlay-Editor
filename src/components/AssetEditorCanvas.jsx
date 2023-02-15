@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fabric } from "fabric";
 
 import "../App.css"
+import BeatLoader from 'react-spinners/BeatLoader';
 
 var keyPressed, keyPressedOptions;
 var mouseX, mouseY;
@@ -43,6 +44,7 @@ function AssetEditorCanvas(props) {
     const assetOptions = props.assetOptions;
     const assetData = props.assetData.current;
     const canvasOptions = props.canvasOptions;
+    const loading = props.loading;
 
     const [canvas, setCanvas] = useState(null);  
     const [labels, setLabels] = useState(null);  
@@ -267,7 +269,10 @@ function AssetEditorCanvas(props) {
                 id="overlay"
                 className="overlayCanvas"
             />
-            <img src={assetImagePath} alt="" className="assetImage" width={assetOptions.width} height={assetOptions.height}/>
+            {loading ? (
+                <BeatLoader color="#d90166" />
+            ) : <img src={assetImagePath} alt="" className="assetImage" width={assetOptions.width} height={assetOptions.height}/>}
+            
         </div>
     )
 }

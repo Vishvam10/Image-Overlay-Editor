@@ -31,6 +31,7 @@ function inverseScaleAssetData(data, scaleX, scaleY) {
 
 function AssetEditor(props) {
   let assetImagePath = props.assetPath;
+  let loading = props.loading;
 
   const assetData = useRef(props.assetData);
   const [currentLabel, setCurrentLabel] = useState();
@@ -177,6 +178,7 @@ function AssetEditor(props) {
         onLabelEdit={handleLabelOnEdit}
         onLabelCreate={handleOnLabelCreate}
         onLabelDelete={handleLabelOnDelete}
+        loading={loading}
       />
     </div>
   );

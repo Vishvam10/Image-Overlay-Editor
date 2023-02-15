@@ -170,6 +170,7 @@ function App() {
   const [assetURL, setAssetURL] = useState("");
   const [assetData, setAssetData] = useState([]);
   const [assetOptions, setAssetOptions] = useState({});
+  const [loading, setLoading] = useState(false);
   
   let canvasOptions = {
     width : 1000,
@@ -213,6 +214,7 @@ function App() {
   }
   
   async function init(dataURL, file, input_type) {    
+    setLoading(true);
     let canvasOptions = {
       width : 1000,
       height : 600  
@@ -242,6 +244,7 @@ function App() {
       
       setAssetData(data);
       setAssetOptions(aOptions);
+      setLoading(false);
       
     } else if(input_type == "url_screenshot") {
       
@@ -265,6 +268,7 @@ function App() {
 
       setAssetData(data);
       setAssetOptions(aOptions);
+      setLoading(false);
     } 
 
   }
@@ -309,6 +313,7 @@ function App() {
         onExportYOLO={exportYOLO}
         onFileUpload={handleFileUpload}
         onURLScreenshot={handleURLScreenshot}
+        loading={loading}
       />
     </div>
   );
