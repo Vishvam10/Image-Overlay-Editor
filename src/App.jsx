@@ -1,10 +1,11 @@
-import { useEffect, useReducer, useState } from 'react';
+import { useState } from 'react';
 
 import AssetEditor from './components/AssetEditor';
 
 import './App.css';
 
 function assignID(labels) {
+  console.log("labels : ", labels)
   if(!labels) {
     return;
   }
@@ -164,10 +165,6 @@ function exportToJSON(obj, filename){
   link.remove();
 }
 
-const delay = (ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function App() {
   
   const [assetURL, setAssetURL] = useState("");
@@ -179,27 +176,43 @@ function App() {
     height : 600  
   }
 
-  async function getMLOutput() {
-    const d = delay(1000)
-    const dummyData = JSON.parse("{\"containers\": [{\"coordinates\": [0, 0, 800, 48], \"type\": \"container\", \"children\": [{\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Home\"}, {\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Portfo 0\"}, {\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Team\"}]}, {\"coordinates\": [0, 46, 800, 416], \"type\": \"container\", \"children\": [{\"type\": \"image\", \"coordinates\": [411, 134, 325, 245]}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"Grow your business\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"with Vesperr\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"We are team of talanted designers making\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"websites with Bootstrap\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"Get Started\"}]}, {\"coordinates\": [0, 460, 800, 139], \"type\": \"container\", \"children\": [{\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"citrus\"}, {\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"Trustly\"}, {\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"myob\"}]}]}")
-    // let data = await fetch("./data.json");
-    // console.log("ml data : ", data)
-    // const formData = new FormData()
-    // formData.append("img", "@\"")
+  async function getMLOutput(file, imgWidth, imgHeight) {
+    
+    /*
+      const dummyData = JSON.parse("{\"containers\": [{\"coordinates\": [0, 0, 800, 48], \"type\": \"container\", \"children\": [{\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Home\"}, {\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Portfo 0\"}, {\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Team\"}]}, {\"coordinates\": [0, 46, 800, 416], \"type\": \"container\", \"children\": [{\"type\": \"image\", \"coordinates\": [411, 134, 325, 245]}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"Grow your business\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"with Vesperr\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"We are team of talanted designers making\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"websites with Bootstrap\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"Get Started\"}]}, {\"coordinates\": [0, 460, 800, 139], \"type\": \"container\", \"children\": [{\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"citrus\"}, {\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"Trustly\"}, {\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"myob\"}]}]}")
+    */
+    
+    const imgBlob = new File([file], "", {
+      type: file.type,
+    })
 
-    // const data = await fetch("http://ec2-54-145-197-243.compute-1.amazonaws.com:8000/get_coordinates_from_image_object", {
-    //   formData,
-    //   headers: {
-    //     "Content-Type": "multipart/form-data"
-    //   },
-    //   method: "POST"
-    // });
+    const formData = new FormData()
+    formData.append("img", imgBlob)
 
-    // console.log("ML data : ", data)
-    return dummyData;
+    let data = await fetch("http://ec2-3-93-77-238.compute-1.amazonaws.com:8000/get_coordinates_from_image_object", {
+      mode: "cors",
+      body: formData,
+      method: "POST"
+    });
+
+    if(data.status == 200) {
+      data = await data.json();
+      data = JSON.parse(data);
+      data = data.containers;
+      data = assignID(data);
+      data = assignParent(data, null);
+      data = flattenLabels(data);
+      data = groupSimilarLabels(data);
+      
+      const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
+      data = scaleAssetData(data, rd.scaleX, rd.scaleY);
+      return data;
+    }
+    
+    return [];
   }
   
-  async function init(aURL, mlOutput) {    
+  async function init(aURL, file, mlOutput) {    
     let canvasOptions = {
       width : 1000,
       height : 600  
@@ -215,14 +228,8 @@ function App() {
     let data = [];
     let aOptions;
     if(mlOutput) {
-      data = await getMLOutput(aURL);
-      data = data.containers;
-      data = assignID(data);
-      data = assignParent(data, null);
-      data = flattenLabels(data);
-      data = groupSimilarLabels(data);
+      data = await getMLOutput(file, imgWidth, imgHeight);
       const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
-      data = scaleAssetData(data, rd.scaleX, rd.scaleY);
         
       aOptions = {
         scaleX: rd.scaleX,
@@ -263,10 +270,10 @@ function App() {
     exportToCSV("types", t)
   }
 
-  function handleFileUpload(dataURL, mlOutput) {
+  function handleFileUpload(dataURL, file, mlOutput) {
     console.log("in app : ", assetOptions); 
     setAssetURL(dataURL);
-    init(dataURL, mlOutput);
+    init(dataURL, file, mlOutput);
   }
 
   return (

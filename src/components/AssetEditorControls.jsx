@@ -21,7 +21,7 @@ function AssetEditorControls(props) {
             let reader = new FileReader();
             reader.onload = function(){
                 let dataURL = reader.result;
-                props.onFileUpload(dataURL, mlOutput.checked);
+                props.onFileUpload(dataURL, file, mlOutput.checked);
             };
             reader.readAsDataURL(file);
         }

@@ -84,8 +84,8 @@ function AssetEditor(props) {
     }
   }
 
-  function handleFileUpload(dataURL, mlOutput) {
-    props.onFileUpload(dataURL, mlOutput);
+  function handleFileUpload(dataURL, file, mlOutput) {
+    props.onFileUpload(dataURL, file, mlOutput);
   }
 
   function handleOnLabelCreate(new_label) {
@@ -126,7 +126,7 @@ function AssetEditor(props) {
 
   function handleExportYOLO() {
     const d = inverseScaleAssetData(
-      JSON.parse(JSON.stringify(assetData)),
+      JSON.parse(JSON.stringify(assetData.current)),
       assetOptions.scaleX,
       assetOptions.scaleY
     );

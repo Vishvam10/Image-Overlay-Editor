@@ -108,14 +108,14 @@ ion-icon {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin: 0rem -1rem 0rem 0rem;
+  margin: 0rem 0rem -1rem 0rem;
   overflow-y: scroll;
 }
 
 .labelInformationSubGroup {
   display: flex;
   flex-direction: column;
-  margin: 0rem 0rem 1,2rem 0rem;
+  margin: 0rem 0rem 1.2rem 0rem;
   background-color: #f4f4f4;
   box-shadow: rgba(187, 195, 204, 0.2) 0px 8px 24px;
   border: 1px solid #cacaca;
