@@ -212,22 +212,24 @@ function App() {
     return [];
   }
   
-  async function init(aURL, file, mlOutput) {    
+  async function init(dataURL, file, input_type) {    
     let canvasOptions = {
       width : 1000,
       height : 600  
     }
-    let img = new Image();
-    img.src = aURL;
     
-    const imgWidth = img.naturalWidth; 
-    const imgHeight = img.naturalWidth; 
-    
-    img = null;
-
     let data = [];
     let aOptions;
-    if(mlOutput) {
+    
+    if(input_type == "file_upload") {
+      let img = new Image();
+      img.src = dataURL;
+      
+      const imgWidth = img.naturalWidth; 
+      const imgHeight = img.naturalWidth; 
+      
+      img = null;
+      
       data = await getMLOutput(file, imgWidth, imgHeight);
       const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
         
@@ -240,7 +242,17 @@ function App() {
       
       setAssetData(data);
       setAssetOptions(aOptions);
-    } else {
+      
+    } else if(input_type == "url_screenshot") {
+      
+      let img = new Image();
+      img.src = dataURL;
+      
+      const imgWidth = img.naturalWidth; 
+      const imgHeight = img.naturalWidth; 
+      
+      document.body.appendChild(img)
+      
       const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
       aOptions = {
         scaleX: rd.scaleX,
@@ -248,8 +260,13 @@ function App() {
         width: Math.round(rd.width),
         height: Math.round(rd.height)
       }
+
+      img = null;
+
+      setAssetData(data);
       setAssetOptions(aOptions);
-    }
+    } 
+
   }
 
   function exportJSON(data) {
@@ -270,11 +287,16 @@ function App() {
     exportToCSV("types", t)
   }
 
-  function handleFileUpload(dataURL, file, mlOutput) {
-    console.log("in app : ", assetOptions); 
+  function handleFileUpload(dataURL, file) {
     setAssetURL(dataURL);
-    init(dataURL, file, mlOutput);
+    init(dataURL, file, "file_upload");
   }
+
+  function handleURLScreenshot(dataURL, file) {
+    setAssetURL(dataURL);
+    init(dataURL, file, "url_screenshot");
+  }
+
 
   return (
     <div className="app">
@@ -286,6 +308,7 @@ function App() {
         onExportJSON={exportJSON}
         onExportYOLO={exportYOLO}
         onFileUpload={handleFileUpload}
+        onURLScreenshot={handleURLScreenshot}
       />
     </div>
   );

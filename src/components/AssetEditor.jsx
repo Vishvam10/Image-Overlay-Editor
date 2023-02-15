@@ -88,6 +88,10 @@ function AssetEditor(props) {
     props.onFileUpload(dataURL, file, mlOutput);
   }
 
+  function handleURLScreenshot(dataURL) {
+    props.onURLScreenshot(dataURL)
+  }
+
   function handleOnLabelCreate(new_label) {
     if(new_label) {
       const temp = [...assetData.current, new_label];
@@ -160,6 +164,7 @@ function AssetEditor(props) {
             onExportJSON={handleExportJSON}
             onExportYOLO={handleExportYOLO}
             onFileUpload={handleFileUpload}
+            onURLScreenshot={handleURLScreenshot}
           />
         </div>
       </div>

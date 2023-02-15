@@ -13,9 +13,10 @@ function AssetEditorLabelInformation(props) {
         let type = String(e.target.innerText).replace("\n", "").replace("\t", "").replace(" ", "").toLowerCase();
         
         if(type.length > 0 && type.length < 20 && ALLOWED_TYPES.includes(type)) {
-            labelData["type"] = type;
-            console.log("reached")
-            props.onLabelTypeChange(labelData["id"], type);
+            let t = labelData["type"];
+            // t.split()[0] = type;
+            // console.log("t : ", t)
+            props.onLabelTypeChange(labelData["id"], t);
         } 
         return;
     }
@@ -65,7 +66,7 @@ function AssetEditorLabelInformation(props) {
 
     return (
         <div className="assetEditorLabelInformation">
-            <h2 className="assetEditorLabelInformationHeading">Label Information</h2>
+            <h2 className="assetEditorLabelInformationHeading">Annotation</h2>
             {info}
         </div>
     )

@@ -17,6 +17,26 @@ function getDarkColor(ind) {
     return colorList["red"][ind % 5]
 }
 
+function getLabelByID(labels, id) {
+    let l;
+    labels.forEach((ele) => {
+        if(ele["id"] === id) {
+            l = ele;
+            return;
+        }
+    });
+    return l;
+}
+
+function getParents(labels, id, text) {
+    const label = getLabelByID(labels, id);
+    if(label["parent"] != null) {
+        text += (">" + label["type"])
+        return getParents(labels, label["parent"], text)
+    } 
+    return text;
+}
+
 function AssetEditorCanvas(props) { 
 
     const assetImagePath = props.assetImagePath;
@@ -77,9 +97,7 @@ function AssetEditorCanvas(props) {
         const canv = document.getElementsByTagName("canvas")[1];
         canv.tabIndex = 1000;
         if(canv) {
-            console.log("html canvas : ", canv);
             fabric.util.addListener(canv, "keydown", function (options) {
-                console.log("reached : ", options)
                 if (options.repeat) {
                     return;
                 }
@@ -157,11 +175,12 @@ function AssetEditorCanvas(props) {
         if(assetImagePath) {
             for(let i=0; i<l.length; i++) {
                 const ele = l[i];
-                let text = ele["type"] 
+                let text = ele["type"];
                 if(ele["parent"]) {
-                    text = ele["parent"] + " > " + text; 
+                    text = ele["parent"] + " > " + text;
                 }
                 const color = getDarkColor(i);
+
                 const rect = new fabric.Rect({
                     id: ele["id"],
                     left: ele["coordinates"][0],
@@ -177,7 +196,6 @@ function AssetEditorCanvas(props) {
                     hasRotatingPoint: false,
                     transparentCorners: false,
                 });
-                
                 const textBox = new fabric.Textbox(text, {
                     left: rect.left,
                     top: rect.top,
@@ -191,7 +209,6 @@ function AssetEditorCanvas(props) {
                     hasBorders: false,
                     hasControls: false,
                 });
-
                 const group = new fabric.Group([rect, textBox], {
                     left: rect.left,
                     width: rect.width,
