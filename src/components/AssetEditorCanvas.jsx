@@ -74,27 +74,33 @@ function AssetEditorCanvas(props) {
     }, [labels, assetImagePath])
 
     useEffect(() => {
-        fabric.util.addListener(document.body, "keydown", function (options) {
-            if (options.repeat) {
-                return;
-            }
-            keyPressed = options.which || options.keyCode; 
-            keyPressedOptions = options;
-
-            if(canvas) {
-                if((options.key === "c") && (options.keyCode === 67)) {
-                    handleOnLabelCreate(mouseX, mouseY);
-                    keyPressed = null;
-                } else if((options.key === "d") && (options.keyCode === 68)) {
-                    const l = canvas.getActiveObject();
-                    if(l) {
-                        const rect = l._objects[0]["id"]
-                        handleOnLabelDelete(rect);
-                    }
-                    keyPressed = null;
+        const canv = document.getElementsByTagName("canvas")[1];
+        canv.tabIndex = 1000;
+        if(canv) {
+            console.log("html canvas : ", canv);
+            fabric.util.addListener(canv, "keydown", function (options) {
+                console.log("reached : ", options)
+                if (options.repeat) {
+                    return;
                 }
-            }
-        });
+                keyPressed = options.which || options.keyCode; 
+                keyPressedOptions = options;
+    
+                if(canvas) {
+                    if((options.key === "c") && (options.keyCode === 67)) {
+                        handleOnLabelCreate(mouseX, mouseY);
+                        keyPressed = null;
+                    } else if((options.key === "d") && (options.keyCode === 68)) {
+                        const l = canvas.getActiveObject();
+                        if(l) {
+                            const rect = l._objects[0]["id"]
+                            handleOnLabelDelete(rect);
+                        }
+                        keyPressed = null;
+                    }
+                }
+            });
+        }
 
     },[canvas])
 

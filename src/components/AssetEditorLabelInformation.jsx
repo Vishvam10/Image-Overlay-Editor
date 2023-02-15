@@ -1,5 +1,8 @@
 import "../App.css";
 
+const ALLOWED_TYPES = [
+    "a", "div", "link", "img", "text", "section", "button", "container"
+]
 
 function AssetEditorLabelInformation(props) {
 
@@ -7,11 +10,14 @@ function AssetEditorLabelInformation(props) {
     let id="", type="", coordinates="", dimensions="", text="", parent="null", info="";
 
     function handleUpdateLabel(e) {
-        const type = String(e.target.innerText);
-        if(type.length > 0) {
+        let type = String(e.target.innerText).replace("\n", "").replace("\t", "").replace(" ", "").toLowerCase();
+        
+        if(type.length > 0 && type.length < 20 && ALLOWED_TYPES.includes(type)) {
             labelData["type"] = type;
+            console.log("reached")
             props.onLabelTypeChange(labelData["id"], type);
-        }
+        } 
+        return;
     }
 
     if(labelData) {
@@ -37,16 +43,16 @@ function AssetEditorLabelInformation(props) {
                     <p className="labelInformationDetail">{parent}</p>
                 </span>
                 <span className="labelInformationSubGroup">
-                    <h3 className="labelInformationHeader">TEXT</h3>
-                    <p className="labelInformationDetail">{text}</p>
-                </span>
-                <span className="labelInformationSubGroup">
                     <h3 className="labelInformationHeader">COORDINATES</h3>
                     <p className="labelInformationDetail">{coordinates}</p>
                 </span>
                 <span className="labelInformationSubGroup">
                     <h3 className="labelInformationHeader">DIMENSIONS</h3>
                     <p className="labelInformationDetail">{dimensions}</p>
+                </span>
+                <span className="labelInformationSubGroup">
+                    <h3 className="labelInformationHeader">TEXT</h3>
+                    <p className="labelInformationDetail">{text}</p>
                 </span>
             </div>
         )
