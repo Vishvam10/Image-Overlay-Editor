@@ -165,6 +165,23 @@ function exportToJSON(obj, filename){
   link.remove();
 }
 
+const delay = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getHeightAndWidthFromDataUrl(dataURL) {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.src = dataURL
+    img.onload = () => {
+      resolve({
+        height: img.height,
+        width: img.width
+      })
+    }
+  })
+}
+
 function App() {
   
   const [assetURL, setAssetURL] = useState("");
@@ -177,12 +194,30 @@ function App() {
     height : 600  
   }
 
+  async function getScreenshot(dataURL) {
+    const d = {
+      "website_url" : dataURL
+    }
+    let data = await fetch("http://127.0.0.1:5000/api/screenshot", {
+      "headers" : {
+        "Content-Type" : "application/json"
+      },
+      "method" : "POST",
+      "body": JSON.stringify(d)
+    });
+
+    if(data.status == 200) {
+      data = await data.blob();
+      const imgFile = data;
+      const imageObjectURL = URL.createObjectURL(data);
+      
+      const dimensions = await getHeightAndWidthFromDataUrl(imageObjectURL)
+      return [imageObjectURL, imgFile, dimensions.width, dimensions.height]
+    }
+  }
+
   async function getMLOutput(file, imgWidth, imgHeight) {
-    
-    /*
-      const dummyData = JSON.parse("{\"containers\": [{\"coordinates\": [0, 0, 800, 48], \"type\": \"container\", \"children\": [{\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Home\"}, {\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Portfo 0\"}, {\"type\": \"text\", \"coordinates\": [203, 0, 533, 46], \"text\": \"Team\"}]}, {\"coordinates\": [0, 46, 800, 416], \"type\": \"container\", \"children\": [{\"type\": \"image\", \"coordinates\": [411, 134, 325, 245]}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"Grow your business\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"with Vesperr\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"We are team of talanted designers making\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"websites with Bootstrap\"}, {\"type\": \"text\", \"coordinates\": [56, 167, 298, 178], \"text\": \"Get Started\"}]}, {\"coordinates\": [0, 460, 800, 139], \"type\": \"container\", \"children\": [{\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"citrus\"}, {\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"Trustly\"}, {\"type\": \"text\", \"coordinates\": [11, 461, 787, 52], \"text\": \"myob\"}]}]}")
-    */
-    
+
     const imgBlob = new File([file], "", {
       type: file.type,
     })
@@ -228,7 +263,7 @@ function App() {
       img.src = dataURL;
       
       const imgWidth = img.naturalWidth; 
-      const imgHeight = img.naturalWidth; 
+      const imgHeight = img.naturalHeight; 
       
       img = null;
       
@@ -247,14 +282,10 @@ function App() {
       setLoading(false);
       
     } else if(input_type == "url_screenshot") {
-      
-      let img = new Image();
-      img.src = dataURL;
-      
-      const imgWidth = img.naturalWidth; 
-      const imgHeight = img.naturalWidth; 
-      
-      document.body.appendChild(img)
+
+      const [imageObjectURL, imgFile, imgWidth, imgHeight] = await getScreenshot(dataURL);
+
+      data = await getMLOutput(imgFile, imgWidth, imgHeight);
       
       const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
       aOptions = {
@@ -263,9 +294,7 @@ function App() {
         width: Math.round(rd.width),
         height: Math.round(rd.height)
       }
-
-      img = null;
-
+      setAssetURL(imageObjectURL);
       setAssetData(data);
       setAssetOptions(aOptions);
       setLoading(false);
@@ -297,7 +326,6 @@ function App() {
   }
 
   function handleURLScreenshot(dataURL, file) {
-    setAssetURL(dataURL);
     init(dataURL, file, "url_screenshot");
   }
 

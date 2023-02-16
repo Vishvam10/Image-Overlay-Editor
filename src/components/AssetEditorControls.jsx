@@ -40,10 +40,9 @@ function AssetEditorControls(props) {
     }
     
     function handleURLScreenshot() {
-        console.log("url modal ref : ", URLModalRef);
-        const url = URLInpRef.current.value;
-        const ifr = `<iframe src=${url} sandbox></iframe>`;
-        URLModalRef.current.insertAdjacentHTML("beforeend", ifr);
+        const dataURL = URLInpRef.current.value;
+        hideModal();
+        props.onURLScreenshot(dataURL);
     }
 
     function handleExportJSON() {
