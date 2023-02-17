@@ -151,6 +151,8 @@ function AssetEditor(props) {
     props.onExportYOLO(data, types);
   }
 
+  console.log("AE asset options : ", assetOptions)
+
   return (
     <div className="assetEditor">
       <div className="assetSidePanel">

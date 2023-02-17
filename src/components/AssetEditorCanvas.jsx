@@ -42,8 +42,8 @@ function AssetEditorCanvas(props) {
 
     const assetImagePath = props.assetImagePath;
     const assetOptions = props.assetOptions;
+    console.log("C asset options : ", assetOptions)
     const assetData = props.assetData.current;
-    const canvasOptions = props.canvasOptions;
     const loading = props.loading;
 
     const [canvas, setCanvas] = useState(null);  
@@ -53,9 +53,7 @@ function AssetEditorCanvas(props) {
         console.log("init");
         function initCanvas() {
             let c = new fabric.Canvas("overlay", {
-                height: canvasOptions.height,
-                width: canvasOptions.width,
-                containerClass: "overlayCanvas",
+                containerClass: "oCanvas",
                 fireRightClick: true,
                 stopContextMenu: true,
                 selection: false,
@@ -63,7 +61,6 @@ function AssetEditorCanvas(props) {
                 preserveObjectStacking: true,
                 altSelectionKey: true,
                 renderOnAddRemove: false
-                // perPixelTargetFind: true  
             })
             c.setBackgroundColor(null, c.renderAll.bind(c));
             return c;
@@ -267,12 +264,11 @@ function AssetEditorCanvas(props) {
         <div className="assetEditorCanvas">
             <canvas 
                 id="overlay"
-                className="overlayCanvas"
+                width="1000" height="1600"
             />
             {loading ? (
                 <BeatLoader color="#d90166" />
             ) : <img src={assetImagePath} alt="" className="assetImage" width={assetOptions.width} height={assetOptions.height}/>}
-            
         </div>
     )
 }

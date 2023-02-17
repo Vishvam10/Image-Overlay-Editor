@@ -60,7 +60,7 @@ function scaleAssetData(labels, scaleX, scaleY) {
 
 function calculateAspectRatioFit(imgWidth, imgHeight, canvasWidth, canvasHeight) {
   const scaleX = canvasWidth / imgWidth;
-  const scaleY = canvasHeight / imgHeight
+  const scaleY = canvasHeight / imgHeight;
   // const ratio = Math.min(canvasWidth / imgWidth, canvasHeight / imgHeight);
   return { scaleX, scaleY, width: imgWidth*scaleX, height: imgHeight*scaleY };
 }
@@ -202,6 +202,7 @@ function App() {
       "headers" : {
         "Content-Type" : "application/json"
       },
+      "mode" : "cors",
       "method" : "POST",
       "body": JSON.stringify(d)
     });
@@ -221,6 +222,8 @@ function App() {
     const imgBlob = new File([file], "", {
       type: file.type,
     })
+
+    console.log("img blob : ", imgBlob)
 
     const formData = new FormData()
     formData.append("img", imgBlob)
@@ -284,8 +287,8 @@ function App() {
     } else if(input_type == "url_screenshot") {
 
       const [imageObjectURL, imgFile, imgWidth, imgHeight] = await getScreenshot(dataURL);
-
-      data = await getMLOutput(imgFile, imgWidth, imgHeight);
+      console.log("image file : ", imgFile)
+      // data = await getMLOutput(imgFile, imgWidth, imgHeight);
       
       const rd = calculateAspectRatioFit(imgWidth, imgHeight, canvasOptions.width, canvasOptions.height);
       aOptions = {
@@ -294,6 +297,7 @@ function App() {
         width: Math.round(rd.width),
         height: Math.round(rd.height)
       }
+      console.log("options : ", aOptions)
       setAssetURL(imageObjectURL);
       setAssetData(data);
       setAssetOptions(aOptions);

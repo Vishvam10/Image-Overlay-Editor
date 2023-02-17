@@ -26,6 +26,7 @@ label {
 
 canvas {
   border: 1px solid #cacaca;
+  display: inline-block;
 }
 
 ion-icon {
@@ -163,7 +164,15 @@ ion-icon:active {
 
 .overlayCanvas {
   position: absolute !important;
+}
+
+.oCanvas {
+  height: 60rem !important;
+  position: absolute !important;
+  overflow-x: hidden;
+  overflow-y: scroll;
   z-index: 1000;
+  display: inline-block;
 }
 
 .fileUploadContainer {
@@ -189,6 +198,8 @@ ion-icon:active {
 
 .assetImage {
   opacity: 0.7;
+  overflow-x: hid den;
+  overflow-y: scroll;
 }
 
 .hideInput {
