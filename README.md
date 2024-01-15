@@ -6,7 +6,6 @@ Made using `React` and `Fabric.js`.
 <br>
 
 ## Usage 
-___
 
 <br>
 
